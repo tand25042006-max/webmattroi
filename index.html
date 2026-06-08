@@ -3,37 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời</title>
+    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời - T-Digital</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
-        /* CSS GIAO DIỆN TỔNG THỂ */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        /* TẠO NỀN LIQUID TỐI (DARK MODE GLOW) */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         
-        /* 1. MÀN HÌNH ĐĂNG NHẬP */
-        #login-screen { background: #1e293b; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        #login-screen h2 { margin-bottom: 24px; color: #38bdf8; font-size: 24px; }
-        #login-screen h2 i { margin-right: 10px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 14px; }
-        .input-group input { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
-        .input-group input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
-        #btn-login { width: 100%; padding: 12px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        #btn-login:hover { background: #0ea5e9; }
-        #login-error { color: #f87171; font-size: 14px; margin-top: 12px; display: none; }
+        body { 
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+            color: #f8fafc; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ĐỊNH DẠNG PHONG CÁCH BÓNG KÍNH (GLASSMORPHISM) */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        /* KHUNG CẢNH BÁO MẤT THIẾT BỊ */
+        #device-alert-bar {
+            width: 100%;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.4));
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none; /* Ẩn mặc định, chỉ hiện khi mất kết nối */
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { opacity: 0.7; box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+            50% { opacity: 1; box-shadow: 0 0 25px rgba(239,68,68,0.6); }
+            100% { opacity: 0.7; box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        }
+
+        /* 1. MÀN HÌNH ĐĂNG NHẬP SANG XỊN */
+        #login-screen { 
+            padding: 45px 35px; 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
+        }
+        #login-screen h2 { 
+            font-size: 26px; 
+            font-weight: 700; 
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px; 
+        }
+        #login-screen h2 i { margin-right: 12px; color: #38bdf8; -webkit-text-fill-color: initial; }
+        
+        .input-group { margin-bottom: 24px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            color: #fff; 
+            font-size: 16px; 
+            outline: none; 
+            transition: 0.3s; 
+        }
+        .input-group input:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); }
+        
+        #btn-login { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+            transition: 0.3s; 
+        }
+        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.5); }
+        #login-error { color: #f87171; font-size: 14px; margin-top: 15px; display: none; }
 
         /* 2. GIAO DIỆN DASHBOARD CHÍNH */
-        #main-dashboard { display: none; width: 100%; max-width: 1200px; background: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        header h1 { font-size: 24px; color: #38bdf8; }
-        header h1 i { color: #f59e0b; margin-right: 10px; }
-        .header-buttons { display: flex; gap: 10px; }
-        .btn-action { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        #btn-excel { background: #10b981; color: white; }
-        #btn-excel:hover { background: #059669; }
-        #btn-logout { background: #ef4444; color: white; }
+        #main-dashboard { display: none; width: 100%; max-width: 1150px; padding: 35px; }
+        
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); 
+            padding-bottom: 25px; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        header h1 { 
+            font-size: 23px; 
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header h1 i { color: #f59e0b; margin-right: 12px; -webkit-text-fill-color: initial; filter: drop-shadow(0 0 8px rgba(245,158,11,0.5)); }
+        
+        .header-buttons { display: flex; gap: 12px; }
+        .btn-action { padding: 12px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        #btn-excel { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
+        #btn-excel:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16,185,129,0.4); }
+        #btn-logout { background: transparent; border: 1px solid rgba(239,68,68,0.4); color: #f87171; }
+        #btn-logout:hover { background: rgba(239,68,68,0.15); }
+
+        /* LƯỚI KHỐI HIỂN THỊ THÔNG SỐ */
+        .dashboard-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        
+        .card { 
+            background: rgba(15, 23, 42, 0.5); 
+            padding: 28px 24px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.04); 
+            text-align: center; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover { transform: translateY(-5px); background: rgba(15, 23, 42, 0.7); border-color: rgba(255,255,255,0.12); }
+        
+        /* Hiệu ứng phát quang định danh từng khối */
+        .card.volt { box-shadow: 0 4px 20px rgba(56,189,248,0.06); }
+        .card.current { box-shadow: 0 4px 20px rgba(168,85,247,0.06); }
+        .card.power { box-shadow: 0 4px 20px rgba(245,158,11,0.06); }
+        .card.temp { box-shadow: 0 4px 20px rgba(239,68,68,0.06); }
+
+        .card:hover.volt { box-shadow: 0 10px 25px rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); }
+        .card:hover.current { box-shadow: 0 10px 25px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4); }
+        .card:hover.power { box-shadow: 0 10px 25px rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.4); }
+        .card:hover.temp { box-shadow: 0 10px 25px rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+        
+        .card i { font-size: 36px; margin-bottom: 15px; }
+        .card.volt i { color: #38bdf8; filter: drop-shadow(0 0 8px rgba(56,189,248,0.4)); }
+        .card.current i { color: #a855f7; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4)); }
+        .card.power i { color: #f59e0b; filter: drop-shadow(0 0 8px rgba(245,158,11,0.4)); }
+        .card.temp i { color: #ef4444; filter: drop-shadow(0 0 8px rgba(239,68,68,0.4)); }
+        
+        .card h3 { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .card .value { font-size: 32px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+
+        /* THANH ĐẾ TRẠNG THÁI PHỤ */
+        .footer-status { 
+            background: rgba(15, 23, 42, 0.4); 
+            padding: 18px; 
+            border-radius: 14px; 
+            border: 1px solid rgba(255,255,255,0.04); 
+            display: flex; 
+            justify-content: space-around; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            font-size: 14px; 
+            color: #94a3b8; 
+        }
+        .footer-status span { display: flex; align-items: center; gap: 8px; }
+        .angle-val { font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="glass-panel">
+        <h2><i class="fa-solid fa-solar-panel"></i>Hệ Thống Solar</h2>
+        <div class="input-group">
+            <label>Tài khoản hệ thống:</label>
+            <input type="text" id="txt-username" placeholder="Nhập tài khoản...">
+        </div>
+        <div class="input-group">
+            <label>Mật khẩu mật mã:</label>
+            <input type="password" id="txt-password" placeholder="Nhập mật khẩu...">
+        </div>
+        <button id="btn-login" onclick="handleLogin()">VÀO HỆ THỐNG</button>
+        <p id="login-error">Thông tin đăng nhập chưa đúng, vui lòng nhập lại!</p>
+    </div>
+
+    <div id="main-dashboard" class="glass-panel">
+        <div id="device-alert-bar">
+            <i class="fa-solid fa-triangle-exclamation"></i> ⚠️ CẢNH BÁO: MẤT KẾT NỐI VỚI THIẾT BỊ ESP32! (QUÁ THỜI GIAN ĐỒNG BỘ)
+        </div>
+
+        <header>
+            <h1><i class="fa-solid fa-bolt-lightning"></i>HỆ THỐNG GIÁM SÁT VÀ BÁO LỖI NĂNG LƯỢNG MẶT TRỜI</h1>
+            <div class="header-buttons">
+                <button id="btn-excel" class="btn-action" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+                <button id="btn-logout" class="btn-action" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="dashboard-layout">
+            <div class="card volt">
+                <i class="fa-solid fa-car-battery"></i>
+                <h3>Điện Áp</h3>
+                <div class="value" id="dien-ap">0.0 V</div>
+            </div>
+            <div class="card current">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+                <h3>Dòng Điện</h3>
+                <div class="value" id="dong-dien">0.00 A</div>
+            </div>
+            <div class="card power">
+                <i class="fa-solid fa-plug"></i>
+                <h3>Công Suất</h3>
+                <div class="value" id="cong-suat">0.0 W</div>
+            </div>
+            <div class="card temp">
+                <i class="fa-solid fa-temperature-half"></i>
+                <h3>Nhiệt Độ Pin</h3>
+                <div class="value" id="nhiet-do">-- °C</div>
+            </div>
+        </div>
+
+        <div class="footer-status">
+            <span><i class="fa-solid fa-compass" style="color: #38bdf8;"></i>Trục X: <span id="lbl-x" class="angle-val" style="color: #38bdf8;">0°</span></span>
+            <span><i class="fa-solid fa-compass" style="color: #a855f7;"></i>Trục Y: <span id="lbl-y" class="angle-val" style="color: #a855f7;">0°</span></span>
+            <span><i class="fa-solid fa-temperature-high" style="color: #f59e0b;"></i>Môi trường: <span id="lbl-z" class="angle-val" style="color: #f59e0b;">0°C</span></span>
+            <span><i class="fa-solid fa-circle-dot" id="status-dot" style="color: #10b981;"></i> Trạng thái: <span id="lbl-time" style="color: #10b981;">Đang kết nối</span></span>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://esp32-backend-vqfp.onrender.com/api/data";
+        let localDataLogs = []; 
+        let lastDataTimestamp = null; // Biến ghi lại mốc thời gian nhận dữ liệu cuối cùng
+
+        // --- HÀM XỬ LÝ ĐĂNG NHẬP ---
+        function handleLogin() {
+            const taiKhoan = document.getElementById("txt-username") ? document.getElementById("txt-username").value.trim() : "";
+            const matKhau = document.getElementById("txt-password") ? document.getElementById("txt-password").value.trim() : "";
+            const loginError = document.getElementById("login-error");
+
+            if (taiKhoan === "tanvippro" && matKhau === "123456") {
+                alert("Đăng nhập thành công!");
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-dashboard").style.display = "block";
+                
+                loadSolarData(); 
+                setInterval(loadSolarData, 3000); // Tự động cập nhật mỗi 3 giây
+                setInterval(checkDeviceConnection, 2000); // Kiểm tra lỗi mất thiết bị định kỳ mỗi 2 giây
+            } else {
+                if (loginError) loginError.style.display = "block";
+            }
+        }
+
+        // --- HÀM ĐĂNG XUẤT ---
+        function handleLogout() {
+            document.getElementById("main-dashboard").style.display = "none";
+            document.getElementById("login-screen").style.display = "block";
+            document.getElementById("txt-username").value = "";
+            document.getElementById("txt-password").value = "";
+            if(document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
+        }
+
+        // --- HÀM FETCH LẤY SỐ LIỆU TỪ BACKEND RENDER ---
+        function loadSolarData() {
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi kết nối tới máy chủ Render!");
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Dữ liệu Solar đồng bộ thành công:", data);
+                    if (data && data.length > 0) {
+                        localDataLogs = data; 
+                        const latest = data[data.length - 1]; // Lấy gói dữ liệu mới nhất từ cứng gửi lên
+
+                        // CẬP NHẬT MỐC THỜI GIAN NHẬN DỮ LIỆU CUỐI CÙNG
+                        lastDataTimestamp = new Date().getTime(); 
+
+                        // Đổ dữ liệu chính vào giao diện bóng kính
+                        if(document.getElementById("dien-ap")) {
+                            document.getElementById("dien-ap").innerText = latest.dien_ap !== undefined ? latest.dien_ap.toFixed(1) + " V" : "0.0 V";
+                        }
+                        if(document.getElementById("dong-dien")) {
+                            document.getElementById("dong-dien").innerText = latest.dong_dien !== undefined ? latest.dong_dien.toFixed(2) + " A" : "0.00 A";
+                        }
+                        if(document.getElementById("cong-suat")) {
+                            document.getElementById("cong-suat").innerText = latest.cong_suat !== undefined ? latest.cong_suat.toFixed(1) + " W" : "0.0 W";
+                        }
+                        if(document.getElementById("nhiet-do")) {
+                            document.getElementById("nhiet-do").innerText = latest.nhiet_do !== undefined ? latest.nhiet_do + " °C" : "-- °C";
+                        }
+                        
+                        // Đổ dữ liệu góc trục và nhiệt độ môi trường (khớp ID lbl-x, lbl-y, lbl-z)
+                        if(document.getElementById("lbl-x") && latest.goc_x !== undefined) document.getElementById("lbl-x").innerText = latest.goc_x + "°";
+                        if(document.getElementById("lbl-y") && latest.goc_y !== undefined) document.getElementById("lbl-y").innerText = latest.goc_y + "°";
+                        if(document.getElementById("lbl-z") && latest.nhiet_do !== undefined) document.getElementById("lbl-z").innerText = latest.nhiet_do + "°C";
+                    }
+                })
+                .catch(error => console.error("Lỗi đồng bộ dữ liệu Render:", error));
+        }
+
+        // --- LOGIC TỰ ĐỘNG PHÁT HIỆN BÁO LỖI MẤT THIẾT BỊ ESP32 ---
+        function checkDeviceConnection() {
+            if (lastDataTimestamp === null) return; // Chưa nhận gói dữ liệu đầu tiên thì bỏ qua
+
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - lastDataTimestamp) / 1000; // Đổi sang giây
+
+            const alertBar = document.getElementById("device-alert-bar");
+            const statusDot = document.getElementById("status-dot");
+            const lblTime = document.getElementById("lbl-time");
+
+            // Nếu quá 7 giây không thấy Render cập nhật dữ liệu mới từ ESP32 -> Phát cảnh báo lỗi lập tức
+            if (timeDifference > 7) { 
+                if (alertBar) alertBar.style.display = "block"; // Bật thanh thông báo lỗi đỏ
+                if (statusDot) statusDot.style.color = "#ef4444"; // Chuyển chấm tròn sang đỏ
+                if (lblTime) {
+                    lblTime.innerText = "MẤT KẾT NỐI (Quá 7s)";
+                    lblTime.style.color = "#ef4444";
+                }
+            } else {
+                // Có kết nối lại -> Tắt thông báo lỗi trả về bình thường
+                if (alertBar) alertBar.style.display = "none";
+                if (statusDot) statusDot.style.color = "#10b981";
+                if (lblTime) {
+                    lblTime.innerText = "Đang kết nối";
+                    lblTime.style.color = "#10b981";
+                }
+            }
+        }
+
+        // --- HÀM XUẤT FILE EXCEL BÁO CÁO DỮ LIỆU ---
+        function exportToExcel() {
+            if (localDataLogs.length === 0) {
+                alert("Không có dữ liệu logs để xuất file báo cáo!");
+                return;
+            }
+            try {
+                const formattedData = localDataLogs.map((item, index) => ({
+                    "STT": index + 1,
+                    "Điện Áp (V)": item.dien_ap,
+                    "Dòng Điện (A)": item.dong_dien,
+                    "Công Suất (W)": item.cong_suat,
+                    "Nhiệt Độ (°C)": item.nhiet_do,
+                    "Góc Trục X": item.goc_x,
+                    "Góc Trục Y": item.goc_y,
+                    "Thời Gian Ghi Nhận": item.created_at
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Solar_Logs_Data");
+                XLSX.writeFile(workbook, "BaoCao_HieuSuat_NangLuong_Solar.xlsx");
+                alert("Xuất file báo cáo Excel thành công!");
+            } catch (e) {
+                alert("Đã xảy ra lỗi khi tạo file excel!");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
+        });
+    </script>
+</body>
+</html>
         #btn-logout:hover { background: #dc2626; }
 
         /* LƯỚI KHỐI HIỂN THỊ SỐ LIỆU */
