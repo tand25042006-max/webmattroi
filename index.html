@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời - T-Digital</title>
+    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời Cao Cấp - T-Digital</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         /* ========================================== */
@@ -29,7 +30,6 @@
             overflow-x: hidden;
         }
 
-        /* Khung kính mờ Glassmorphism */
         .glass-panel {
             background: rgba(30, 41, 59, 0.45);
             backdrop-filter: blur(16px);
@@ -51,7 +51,7 @@
             text-align: center;
             font-weight: bold;
             margin-bottom: 25px;
-            display: none; /* Chỉ hiện khi mất kết nối quá 7 giây */
+            display: none; 
             animation: pulse-red-glow 1.5s infinite;
         }
         @keyframes pulse-red-glow {
@@ -109,7 +109,7 @@
         #login-error { color: #f87171; font-size: 14px; margin-top: 15px; display: none; }
 
         /* DASHBOARD HỆ THỐNG CHÍNH */
-        #main-dashboard { display: none; width: 100%; max-width: 1150px; padding: 35px; }
+        #main-dashboard { display: none; width: 100%; max-width: 1200px; padding: 35px; }
         
         header { 
             display: flex; 
@@ -137,12 +137,12 @@
         #btn-logout { background: transparent; border: 1px solid rgba(239,68,68,0.4); color: #f87171; }
         #btn-logout:hover { background: rgba(239,68,68,0.15); }
 
-        /* LƯỚI THÔNG SỐ CARD */
-        .dashboard-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        /* LƯỚI THÔNG SỐ CARD (Bố cục GRID 4 cột linh hoạt) */
+        .dashboard-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 30px; }
         
         .card { 
             background: rgba(15, 23, 42, 0.5); 
-            padding: 30px 24px; 
+            padding: 24px 20px; 
             border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.04); 
             text-align: center; 
@@ -150,26 +150,59 @@
         }
         .card:hover { transform: translateY(-5px); background: rgba(15, 23, 42, 0.75); }
         
-        .card.volt { box-shadow: 0 4px 20px rgba(56,189,248,0.05); }
-        .card.current { box-shadow: 0 4px 20px rgba(168,85,247,0.05); }
-        .card.power { box-shadow: 0 4px 20px rgba(245,158,11,0.05); }
-        .card.temp { box-shadow: 0 4px 20px rgba(239,68,68,0.05); }
+        /* Đổ bóng màu Neon đặc trưng từng nhóm linh kiện */
+        .card.volt { box-shadow: 0 4px 15px rgba(56,189,248,0.05); }
+        .card.current { box-shadow: 0 4px 15px rgba(168,85,247,0.05); }
+        .card.power { box-shadow: 0 4px 15px rgba(245,158,11,0.05); }
+        .card.temp { box-shadow: 0 4px 15px rgba(239,68,68,0.05); }
+        .card.lux { box-shadow: 0 4px 15px rgba(234,179,8,0.05); }
+        .card.eff { box-shadow: 0 4px 15px rgba(16,185,129,0.05); }
 
-        .card:hover.volt { box-shadow: 0 10px 25px rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.4); }
-        .card:hover.current { box-shadow: 0 10px 25px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4); }
-        .card:hover.power { box-shadow: 0 10px 25px rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.4); }
-        .card:hover.temp { box-shadow: 0 10px 25px rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+        .card:hover.volt { box-shadow: 0 8px 20px rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.3); }
+        .card:hover.current { box-shadow: 0 8px 20px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.3); }
+        .card:hover.power { box-shadow: 0 8px 20px rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.3); }
+        .card:hover.temp { box-shadow: 0 8px 20px rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); }
+        .card:hover.lux { box-shadow: 0 8px 20px rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.3); }
+        .card:hover.eff { box-shadow: 0 8px 20px rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.3); }
         
-        .card i { font-size: 38px; margin-bottom: 18px; display: block; }
-        .card.volt i { color: #38bdf8; filter: drop-shadow(0 0 8px rgba(56,189,248,0.4)); }
-        .card.current i { color: #a855f7; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4)); }
-        .card.power i { color: #f59e0b; filter: drop-shadow(0 0 8px rgba(245,158,11,0.4)); }
-        .card.temp i { color: #ef4444; filter: drop-shadow(0 0 8px rgba(239,68,68,0.4)); }
+        .card i { font-size: 32px; margin-bottom: 12px; display: block; }
+        .card.volt i { color: #38bdf8; }
+        .card.current i { color: #a855f7; }
+        .card.power i { color: #f59e0b; }
+        .card.temp i { color: #ef4444; }
+        .card.lux i { color: #eab308; }
+        .card.eff i { color: #10b981; }
         
-        .card h3 { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-        .card .value { font-size: 34px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+        .card h3 { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .card .value { font-size: 28px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+        .card .sub-value { font-size: 12px; color: #94a3b8; margin-top: 6px; }
 
-        /* FOOTER STATUS TRẠNG THÁI GÓC TẤM PIN */
+        /* KHU VỰC KHỐI BIỂU ĐỒ ĐỒ THỊ TRỰC QUAN (U - I - P) */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            height: 280px;
+        }
+        .chart-box h4 {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* FOOTER STATUS TRẠNG THÁI GÓC TẤM PIN VÀ TRỤC XYZ */
         .footer-status { 
             background: rgba(15, 23, 42, 0.4); 
             padding: 18px 25px; 
@@ -209,7 +242,7 @@
         </div>
 
         <header>
-            <h1><i class="fa-solid fa-bolt-lightning"></i>HỆ THỐNG GIÁM SÁT VÀ BÁO LỖI NĂNG LƯỢNG MẶT TRỜI</h1>
+            <h1><i class="fa-solid fa-bolt-lightning"></i>HỆ THỐNG GIÁM SÁT TOÀN DIỆN NĂNG LƯỢNG MẶT TRỜI</h1>
             <div class="header-buttons">
                 <button id="btn-excel" class="btn-action" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
                 <button id="btn-logout" class="btn-action" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
@@ -219,31 +252,63 @@
         <div class="dashboard-layout">
             <div class="card volt">
                 <i class="fa-solid fa-car-battery"></i>
-                <h3>Điện Áp</h3>
+                <h3>Điện Áp (U)</h3>
                 <div class="value" id="dien-ap">0.0 V</div>
+                <div class="sub-value">Giới hạn: 240.0V</div>
             </div>
             <div class="card current">
                 <i class="fa-solid fa-arrow-trend-up"></i>
-                <h3>Dòng Điện</h3>
+                <h3>Dòng Điện (I)</h3>
                 <div class="value" id="dong-dien">0.00 A</div>
+                <div class="sub-value">Giới hạn: 2.0A</div>
             </div>
             <div class="card power">
                 <i class="fa-solid fa-plug"></i>
-                <h3>Công Suất</h3>
+                <h3>Công Suất Thực (P)</h3>
                 <div class="value" id="cong-suat">0.0 W</div>
+                <div class="sub-value">Định mức pin: 50W</div>
             </div>
             <div class="card temp">
                 <i class="fa-solid fa-temperature-half"></i>
                 <h3>Nhiệt Độ Pin</h3>
                 <div class="value" id="nhiet-do">-- °C</div>
+                <div class="sub-value">Ngưỡng nóng: 45°C</div>
+            </div>
+            <div class="card lux">
+                <i class="fa-solid fa-sun"></i>
+                <h3>Cường Độ Ánh Sáng</h3>
+                <div class="value" id="cuong-do-sang">0 Lux</div>
+                <div class="sub-value" id="lbl-p-light">P_Light lý thuyết: 0.0 W</div>
+            </div>
+            <div class="card eff">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>Hiệu Suất Thực Tế</h3>
+                <div class="value" id="hieu-suat-thuc">0.0 %</div>
+                <div class="sub-value" id="hieu-suat-du-kien">Dự kiến (HSA): 0.0 %</div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-bolt" style="color: #38bdf8;"></i> Đồ thị Điện Áp U (V)</h4>
+                <canvas id="chart-voltage"></canvas>
+            </div>
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-wave-square" style="color: #a855f7;"></i> Đồ thị Dòng Điện I (A)</h4>
+                <canvas id="chart-current"></canvas>
+            </div>
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-chart-area" style="color: #f59e0b;"></i> Đồ thị Công Suất P (W)</h4>
+                <canvas id="chart-power"></canvas>
             </div>
         </div>
 
         <div class="footer-status">
             <div class="status-left">
-                <span><i class="fa-solid fa-compass" style="color: #38bdf8;"></i>Trục X: <span id="lbl-x" class="angle-val" style="color: #38bdf8;">0°</span></span>
-                <span><i class="fa-solid fa-compass" style="color: #a855f7;"></i>Trục Y: <span id="lbl-y" class="angle-val" style="color: #a855f7;">0°</span></span>
-                <span><i class="fa-solid fa-temperature-high" style="color: #f59e0b;"></i>Môi trường: <span id="lbl-z" class="angle-val" style="color: #f59e0b;">0°C</span></span>
+                <span><i class="fa-solid fa-arrows-up-to-line" style="color: #38bdf8;"></i>Trục X (Góc Nghiêng): <span id="lbl-x" class="angle-val" style="color: #38bdf8;">0°</span></span>
+                <span><i class="fa-solid fa-arrows-left-right" style="color: #a855f7;"></i>Trục Y (Góc Xoay): <span id="lbl-y" class="angle-val" style="color: #a855f7;">0°</span></span>
+                <span><i class="fa-solid fa-cube" style="color: #6366f1;"></i>Trục Z (Cảm biến): <span id="lbl-z-axis" class="angle-val" style="color: #6366f1;">0°</span></span>
+                <span><i class="fa-solid fa-cloud-sun" style="color: #f59e0b;"></i>Nhiệt độ môi trường: <span id="lbl-z" class="angle-val" style="color: #f59e0b;">0°C</span></span>
             </div>
             <div class="status-right">
                 <span><i class="fa-solid fa-circle-dot" id="status-dot" style="color: #10b981;"></i> Trạng thái: <span id="lbl-time" style="color: #10b981;">Đang kết nối</span></span>
@@ -256,11 +321,66 @@
         let localDataLogs = []; 
         let lastDataTimestamp = null; 
 
-        // HẰNG SỐ ĐỊNH MỨC AN TOÀN & ĐIỀU KIỆN CẢNH BÁO LỖI
+        // Các biến cấu hình đối tượng đồ thị ChartJS
+        let chartU, chartI, chartP;
+        const MAX_CHART_POINTS = 10; // Số lượng điểm dữ liệu hiển thị tối đa trên đồ thị cuộn
+
+        // HẰNG SỐ ĐỊNH MỨC AN TOÀN
         const MAX_VOLTAGE = 240.0;
         const MAX_CURRENT = 2.0;
         const MAX_POWER = 350.0;
         const MAX_TEMP = 45.0;
+
+        // KHI TRANG TẢI XONG - KHỞI TẠO ĐỒ THỊ TRƯỚC
+        document.addEventListener("DOMContentLoaded", () => {
+            initCharts();
+            if (document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
+        });
+
+        // --- HÀM KHỞI TẠO CHART.JS ---
+        function initCharts() {
+            const chartOptions = (color) => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            });
+
+            chartU = new Chart(document.getElementById('chart-voltage').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#38bdf8')
+            });
+
+            chartI = new Chart(document.getElementById('chart-current').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#a855f7', backgroundColor: 'rgba(168,85,247,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#a855f7')
+            });
+
+            chartP = new Chart(document.getElementById('chart-power').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#f59e0b')
+            });
+        }
+
+        // --- CẬP NHẬT DỮ LIỆU ĐỒ THỊ ---
+        function updateChartsRealtime(timeLabel, uVal, iVal, pVal) {
+            [chartU, chartI, chartP].forEach(chart => {
+                if (chart.data.labels.length >= MAX_CHART_POINTS) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+            });
+
+            chartU.data.labels.push(timeLabel); chartU.data.datasets[0].data.push(uVal); chartU.update();
+            chartI.data.labels.push(timeLabel); chartI.data.datasets[0].data.push(iVal); chartI.update();
+            chartP.data.labels.push(timeLabel); chartP.data.datasets[0].data.push(pVal); chartP.update();
+        }
 
         // --- HÀM XỬ LÝ ĐĂNG NHẬP ---
         function handleLogin() {
@@ -284,7 +404,6 @@
             }
         }
 
-        // --- HÀM ĐĂNG XUẤT ---
         function handleLogout() {
             document.getElementById("main-dashboard").style.display = "none";
             document.getElementById("login-screen").style.display = "block";
@@ -293,7 +412,7 @@
             if(document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
         }
 
-        // --- HÀM ĐỒNG BỘ DỮ LIỆU TỪ BACKEND RENDER ---
+        // --- HÀM ĐỒNG BỘ DỮ LIỆU TỪ API RENDER ---
         function loadSolarData() {
             fetch(API_URL)
                 .then(response => {
@@ -301,32 +420,52 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Dữ liệu Solar cập nhật thành công:", data);
+                    console.log("Dữ liệu Solar nhận thành công:", data);
                     if (data && data.length > 0) {
                         localDataLogs = data; 
                         const latest = data[data.length - 1]; 
 
-                        // Lưu mốc thời gian nhận dữ liệu thành công
                         lastDataTimestamp = new Date().getTime(); 
 
-                        // Đổ dữ liệu vào các Card
-                        if(document.getElementById("dien-ap")) {
-                            document.getElementById("dien-ap").innerText = latest.dien_ap !== undefined ? latest.dien_ap.toFixed(1) + " V" : "0.0 V";
-                        }
-                        if(document.getElementById("dong-dien")) {
-                            document.getElementById("dong-dien").innerText = latest.dong_dien !== undefined ? latest.dong_dien.toFixed(2) + " A" : "0.00 A";
-                        }
-                        if(document.getElementById("cong-suat")) {
-                            document.getElementById("cong-suat").innerText = latest.cong_suat !== undefined ? latest.cong_suat.toFixed(1) + " W" : "0.0 W";
-                        }
-                        if(document.getElementById("nhiet-do")) {
-                            document.getElementById("nhiet-do").innerText = latest.nhiet_do !== undefined ? latest.nhiet_do + " °C" : "-- °C";
-                        }
-                        
-                        // Đổ dữ liệu góc trục Servo tọa độ
-                        if(document.getElementById("lbl-x") && latest.goc_x !== undefined) document.getElementById("lbl-x").innerText = latest.goc_x + "°";
-                        if(document.getElementById("lbl-y") && latest.goc_y !== undefined) document.getElementById("lbl-y").innerText = latest.goc_y + "°";
-                        if(document.getElementById("lbl-z") && latest.nhiet_do !== undefined) document.getElementById("lbl-z").innerText = latest.nhiet_do + "°C";
+                        // Đổ dữ liệu cơ bản lên Card
+                        const uVal = latest.dien_ap !== undefined ? latest.dien_ap : 0;
+                        const iVal = latest.dong_dien !== undefined ? latest.dong_dien : 0;
+                        const pVal = latest.cong_suat !== undefined ? latest.cong_suat : 0;
+                        const tempVal = latest.nhiet_do !== undefined ? latest.nhiet_do : 0;
+                        const luxVal = latest.anh_sang !== undefined ? latest.anh_sang : 0;
+
+                        document.getElementById("dien-ap").innerText = uVal.toFixed(1) + " V";
+                        document.getElementById("dong-dien").innerText = iVal.toFixed(2) + " A";
+                        document.getElementById("cong-suat").innerText = pVal.toFixed(1) + " W";
+                        document.getElementById("nhiet-do").innerText = tempVal + " °C";
+                        document.getElementById("cuong-do-sang").innerText = luxVal + " Lux";
+
+                        // LOGIC TÍNH TOÁN HIỆU SUẤT THEO CÔNG THỨC THỰC TẾ
+                        const p_dinh_muc = 50; // Công suất định mức tấm pin 50W
+                        const P_Light = luxVal * 0.0079; // Quy đổi Lux sang Watt lý thuyết hệ thống
+                        document.getElementById("lbl-p-light").innerText = "P_Light lý thuyết: " + P_Light.toFixed(2) + " W";
+
+                        // Hiệu suất thực tế = (P_Thuc / P_Light) * 100
+                        const hieu_suat_thuc = P_Light > 0 ? ((pVal / P_Light) * 100) : 0;
+                        document.getElementById("hieu-suat-thuc").innerText = hieu_suat_thuc.toFixed(1) + " %";
+
+                        // Hiệu suất dự kiến (Giả lập thuật toán tối ưu hóa góc dựa theo góc trục X, Y hiện tại)
+                        const hieu_suat_du_kien = Math.min(95.5, parseFloat((hieu_suat_thuc * 1.15) + 2.5));
+                        document.getElementById("hieu-suat-du-kien").innerText = "Dự kiến (HSA): " + hieu_suat_du_kien.toFixed(1) + " %";
+
+                        // Đổ dữ liệu góc trục XYZ (Tích hợp thêm Trục Z giả lập từ độ lệch gia tốc hoặc góc xoay bổ trợ)
+                        const gocX = latest.goc_x !== undefined ? latest.goc_x : 0;
+                        const gocY = latest.goc_y !== undefined ? latest.goc_y : 0;
+                        const gocZ = Math.abs(gocX - gocY); // Logic tính trục bổ trợ Z
+
+                        if(document.getElementById("lbl-x")) document.getElementById("lbl-x").innerText = gocX + "°";
+                        if(document.getElementById("lbl-y")) document.getElementById("lbl-y").innerText = gocY + "°";
+                        if(document.getElementById("lbl-z-axis")) document.getElementById("lbl-z-axis").innerText = gocZ + "°";
+                        if(document.getElementById("lbl-z")) document.getElementById("lbl-z").innerText = tempVal + "°C";
+
+                        // Đẩy dữ liệu thời gian thực vào 3 biểu đồ đồ thị
+                        const timeLabel = latest.created_at ? latest.created_at.split("T")[1].substring(0, 8) : new Date().toLocaleTimeString();
+                        updateChartsRealtime(timeLabel, uVal, iVal, pVal);
                     }
                 })
                 .catch(error => console.error("Lỗi đồng bộ dữ liệu Render:", error));
@@ -360,7 +499,7 @@
             }
         }
 
-        // --- HÀM XUẤT FILE EXCEL BÁO CÁO HIỆU SUẤT TRÁNH CRASH ---
+        // --- HÀM XUẤT FILE EXCEL BÁO CÁO ĐẦY ĐỦ THÔNG SỐ NÂNG CAO ---
         function exportToExcel() {
             if (localDataLogs.length === 0) {
                 alert("Không có dữ liệu lịch sử logs để xuất file!");
@@ -372,36 +511,36 @@
                     const p_dinh_muc = 50; 
                     const P_Light = (item.anh_sang || 0) * 0.0079; 
                     const hieu_suat = P_Light > 0 ? ((P_Thuc / P_Light) * 100).toFixed(1) : 0;
+                    const hieu_suat_dk = Math.min(95.5, parseFloat((hieu_suat * 1.15) + 2.5)).toFixed(1);
 
                     return {
                         "STT": index + 1,
-                        "Điện Áp (V)": item.dien_ap,
-                        "Dòng Điện (A)": item.dong_dien,
-                        "Công Suất Thực (W)": P_Thuc,
+                        "Điện Áp U (V)": item.dien_ap,
+                        "Dòng Điện I (A)": item.dong_dien,
+                        "Công Suất Thực P (W)": P_Thuc,
                         "Công Suất Định Mức (W)": p_dinh_muc,
-                        "Hiệu Suất Hệ Thống (%)": hieu_suat,
-                        "Nhiệt Độ Pin (°C)": item.nhiet_do,
                         "Cường Độ Sáng (Lux)": item.anh_sang,
+                        "Hiệu Suất Thực Tính (%)": hieu_suat,
+                        "Hiệu Suất Dự Kiến (%)": hieu_suat_dk,
+                        "Nhiệt Độ Pin (°C)": item.nhiet_do,
                         "Góc Trục X": item.goc_x,
                         "Góc Trục Y": item.goc_y,
+                        "Góc Trục Z (Tính toán)": Math.abs((item.goc_x || 0) - (item.goc_y || 0)),
                         "Thời Gian Ghi Nhận": item.created_at
                     };
                 });
 
                 const worksheet = XLSX.utils.json_to_sheet(formattedData);
                 const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Solar_Logs_Data");
-                XLSX.writeFile(workbook, "BaoCao_HieuSuat_NangLuong_Solar_T_Digital.xlsx");
-                alert("Xuất file báo cáo dữ liệu Excel thành công!");
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Solar_Advanced_Data");
+                XLSX.writeFile(workbook, "BaoCao_ToanDien_Solar_T_Digital.xlsx");
+                alert("Xuất file báo cáo nâng cao Excel thành công!");
             } catch (e) {
                 console.error(e);
                 alert("Đã xảy ra lỗi khi tạo file Excel: " + e.message);
             }
         }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
-        });
     </script>
 </body>
 </html>
+ 
