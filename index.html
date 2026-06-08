@@ -3,1212 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời Cao Cấp - T-Digital</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
     <style>
-        :root {
-            --bg-deep:    #050b18;
-            --bg-mid:     #0a1628;
-            --bg-panel:   rgba(10, 22, 45, 0.75);
-            --bg-card:    rgba(6, 14, 30, 0.8);
-            --border:     rgba(56, 189, 248, 0.12);
-            --border-hot: rgba(56, 189, 248, 0.35);
-
-            --cyan:   #38bdf8;
-            --violet: #818cf8;
-            --amber:  #f59e0b;
-            --emerald:#10b981;
-            --rose:   #f43f5e;
-            --yellow: #fbbf24;
-            --indigo: #6366f1;
-
-            --text-primary:   #e2e8f0;
-            --text-secondary: #64748b;
-            --text-dim:       #334155;
-
-            --font-display: 'Exo 2', sans-serif;
-            --font-mono:    'JetBrains Mono', monospace;
-
-            --nav-h: 70px;
-            --radius: 16px;
+        /* ========================================== */
+        /* CONFIG NỀN LIQUID TỐI & HIỆU ỨNG BÓNG KÍNH  */
+        /* ========================================== */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
         }
-
-        * { margin:0; padding:0; box-sizing:border-box; }
-
-        body {
-            font-family: var(--font-display);
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            min-height: 100vh;
+        
+        body { 
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+            color: #f8fafc; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* Animated background grid */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
         }
 
-        body::after {
-            content: '';
-            position: fixed;
-            top: -30%;
-            left: -20%;
-            width: 70%;
-            height: 70%;
-            background: radial-gradient(ellipse, rgba(56,189,248,0.04) 0%, transparent 65%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bgPulse 8s ease-in-out infinite alternate;
+        /* THANH CẢNH BÁO MẤT THIẾT BỊ (CHỚP NHÁY ĐỎ) */
+        #device-alert-bar {
+            width: 100%;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.45));
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
+            display: none; 
+            animation: pulse-red-glow 1.5s infinite;
+        }
+        @keyframes pulse-red-glow {
+            0% { opacity: 0.8; box-shadow: 0 0 12px rgba(239,68,68,0.3); }
+            50% { opacity: 1; box-shadow: 0 0 28px rgba(239,68,68,0.65); }
+            100% { opacity: 0.8; box-shadow: 0 0 12px rgba(239,68,68,0.3); }
         }
 
-        @keyframes bgPulse {
-            from { opacity: 0.6; transform: scale(1); }
-            to   { opacity: 1;   transform: scale(1.1); }
+        /* GIAO DIỆN ĐĂNG NHẬP */
+        #login-screen { 
+            padding: 50px 40px; 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
         }
+        #login-screen h2 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 35px; 
+        }
+        #login-screen h2 i { margin-right: 12px; color: #38bdf8; -webkit-text-fill-color: initial; }
+        
+        .input-group { margin-bottom: 24px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            color: #fff; 
+            font-size: 16px; 
+            outline: none; 
+            transition: 0.3s; 
+        }
+        .input-group input:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); }
+        
+        #btn-login { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+            transition: 0.3s; 
+        }
+        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.5); }
+        #login-error { color: #f87171; font-size: 14px; margin-top: 15px; display: none; }
 
-        /* ══════════════════════════════════════
-           LOGIN SCREEN
-        ══════════════════════════════════════ */
-        #login-screen {
-            position: fixed;
-            inset: 0;
+        /* DASHBOARD HỆ THỐNG CHÍNH */
+        #main-dashboard { display: none; width: 100%; max-width: 1200px; padding: 35px; }
+        
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); 
+            padding-bottom: 25px; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        header h1 { 
+            font-size: 22px; 
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header h1 i { color: #f59e0b; margin-right: 12px; -webkit-text-fill-color: initial; filter: drop-shadow(0 0 8px rgba(245,158,11,0.5)); }
+        
+        .header-buttons { display: flex; gap: 12px; }
+        .btn-action { padding: 12px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        #btn-excel { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
+        #btn-excel:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16,185,129,0.4); }
+        #btn-logout { background: transparent; border: 1px solid rgba(239,68,68,0.4); color: #f87171; }
+        #btn-logout:hover { background: rgba(239,68,68,0.15); }
+
+        /* LƯỚI THÔNG SỐ CARD (Bố cục GRID 4 cột linh hoạt) */
+        .dashboard-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        
+        .card { 
+            background: rgba(15, 23, 42, 0.5); 
+            padding: 24px 20px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.04); 
+            text-align: center; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover { transform: translateY(-5px); background: rgba(15, 23, 42, 0.75); }
+        
+        /* Đổ bóng màu Neon đặc trưng từng nhóm linh kiện */
+        .card.volt { box-shadow: 0 4px 15px rgba(56,189,248,0.05); }
+        .card.current { box-shadow: 0 4px 15px rgba(168,85,247,0.05); }
+        .card.power { box-shadow: 0 4px 15px rgba(245,158,11,0.05); }
+        .card.temp { box-shadow: 0 4px 15px rgba(239,68,68,0.05); }
+        .card.lux { box-shadow: 0 4px 15px rgba(234,179,8,0.05); }
+        .card.eff { box-shadow: 0 4px 15px rgba(16,185,129,0.05); }
+
+        .card:hover.volt { box-shadow: 0 8px 20px rgba(56,189,248,0.2); border-color: rgba(56,189,248,0.3); }
+        .card:hover.current { box-shadow: 0 8px 20px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.3); }
+        .card:hover.power { box-shadow: 0 8px 20px rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.3); }
+        .card:hover.temp { box-shadow: 0 8px 20px rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); }
+        .card:hover.lux { box-shadow: 0 8px 20px rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.3); }
+        .card:hover.eff { box-shadow: 0 8px 20px rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.3); }
+        
+        .card i { font-size: 32px; margin-bottom: 12px; display: block; }
+        .card.volt i { color: #38bdf8; }
+        .card.current i { color: #a855f7; }
+        .card.power i { color: #f59e0b; }
+        .card.temp i { color: #ef4444; }
+        .card.lux i { color: #eab308; }
+        .card.eff i { color: #10b981; }
+        
+        .card h3 { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .card .value { font-size: 28px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+        .card .sub-value { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+        /* KHU VỰC KHỐI BIỂU ĐỒ ĐỒ THỊ TRỰC QUAN (U - I - P) */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            height: 280px;
+        }
+        .chart-box h4 {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            background: var(--bg-deep);
+            gap: 8px;
         }
 
-        .login-box {
-            background: rgba(10, 22, 45, 0.9);
-            border: 1px solid var(--border-hot);
-            border-radius: 24px;
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 400px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 60px rgba(56,189,248,0.08), 0 30px 60px rgba(0,0,0,0.5);
-            position: relative;
-            z-index: 1;
+        /* FOOTER STATUS TRẠNG THÁI GÓC TẤM PIN VÀ TRỤC XYZ */
+        .footer-status { 
+            background: rgba(15, 23, 42, 0.4); 
+            padding: 18px 25px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.04); 
+            display: flex; 
+            justify-content: space-between; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            font-size: 14px; 
+            color: #94a3b8; 
         }
-
-        .login-logo {
-            text-align: center;
-            margin-bottom: 36px;
-        }
-
-        .login-logo .icon-ring {
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(99,102,241,0.15));
-            border: 1.5px solid var(--border-hot);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px;
-            box-shadow: 0 0 30px rgba(56,189,248,0.15);
-        }
-
-        .login-logo .icon-ring i { font-size: 28px; color: var(--cyan); }
-        .login-logo h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: 1px; }
-        .login-logo p { font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px; }
-
-        .input-wrap { margin-bottom: 20px; }
-        .input-wrap label { display: block; font-size: 11px; font-family: var(--font-mono); color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .input-wrap input {
-            width: 100%;
-            padding: 13px 16px;
-            background: rgba(5, 11, 24, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 14px;
-            outline: none;
-            transition: 0.3s;
-        }
-        .input-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(56,189,248,0.15); }
-
-        #btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--indigo) 100%);
-            border: none; border-radius: 10px;
-            color: #050b18; font-family: var(--font-display);
-            font-size: 14px; font-weight: 700;
-            letter-spacing: 2px; text-transform: uppercase;
-            cursor: pointer; transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(56,189,248,0.3);
-        }
-        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56,189,248,0.45); }
-        #login-error { color: var(--rose); font-size: 12px; font-family: var(--font-mono); margin-top: 12px; text-align: center; display: none; }
-
-        /* ══════════════════════════════════════
-           APP SHELL
-        ══════════════════════════════════════ */
-        #app { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
-
-        /* TOP HEADER */
-        .app-header {
-            position: sticky; top: 0; z-index: 50;
-            background: rgba(5, 11, 24, 0.92);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            height: 64px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .header-left { display: flex; align-items: center; gap: 14px; }
-        .header-left .logo-icon { color: var(--amber); font-size: 22px; filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
-        .header-left h1 {
-            font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        .header-center {
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .realtime-clock {
-            font-family: var(--font-mono);
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--cyan);
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(56,189,248,0.5);
-        }
-        .realtime-date {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-secondary);
-            letter-spacing: 1px;
-            margin-top: 1px;
-        }
-
-        .header-right { display: flex; gap: 10px; align-items: center; }
-        .btn-sm {
-            padding: 8px 16px; border-radius: 8px; font-family: var(--font-display);
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; gap: 6px; border: none;
-        }
-        .btn-excel { background: linear-gradient(135deg, var(--emerald), #059669); color: #fff; }
-        .btn-excel:hover { box-shadow: 0 4px 15px rgba(16,185,129,0.4); transform: translateY(-1px); }
-        .btn-logout { background: transparent; border: 1px solid rgba(244,63,94,0.4); color: var(--rose); }
-        .btn-logout:hover { background: rgba(244,63,94,0.1); }
-
-        /* DEVICE ALERT */
-        #device-alert-bar {
-            background: linear-gradient(90deg, rgba(244,63,94,0.15), rgba(244,63,94,0.3));
-            border-bottom: 1px solid rgba(244,63,94,0.5);
-            color: #fca5a5;
-            padding: 10px;
-            text-align: center;
-            font-size: 13px; font-weight: 600; font-family: var(--font-mono);
-            display: none;
-            animation: alertPulse 1.5s infinite;
-        }
-        @keyframes alertPulse {
-            0%,100% { opacity: 0.8; } 50% { opacity: 1; }
-        }
-
-        /* PAGE CONTENT */
-        .page-content { flex: 1; overflow-y: auto; padding-bottom: calc(var(--nav-h) + 16px); }
-        .page { display: none; padding: 20px 20px 10px; }
-        .page.active { display: block; }
-
-        /* ══════════════════════════════════════
-           PAGE 1 — DASHBOARD
-        ══════════════════════════════════════ */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px 16px 16px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            border-radius: var(--radius) var(--radius) 0 0;
-        }
-
-        .metric-card.volt::before   { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
-        .metric-card.curr::before   { background: linear-gradient(90deg, transparent, var(--violet), transparent); }
-        .metric-card.power::before  { background: linear-gradient(90deg, transparent, var(--amber), transparent); }
-        .metric-card.temp::before   { background: linear-gradient(90deg, transparent, var(--rose), transparent); }
-        .metric-card.lux::before    { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
-        .metric-card.eff::before    { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
-
-        .metric-card:hover { transform: translateY(-4px); }
-        .metric-card:hover.volt   { border-color: rgba(56,189,248,0.4);   box-shadow: 0 8px 25px rgba(56,189,248,0.12); }
-        .metric-card:hover.curr   { border-color: rgba(129,140,248,0.4);  box-shadow: 0 8px 25px rgba(129,140,248,0.12); }
-        .metric-card:hover.power  { border-color: rgba(245,158,11,0.4);   box-shadow: 0 8px 25px rgba(245,158,11,0.12); }
-        .metric-card:hover.temp   { border-color: rgba(244,63,94,0.4);    box-shadow: 0 8px 25px rgba(244,63,94,0.12); }
-        .metric-card:hover.lux    { border-color: rgba(251,191,36,0.4);   box-shadow: 0 8px 25px rgba(251,191,36,0.12); }
-        .metric-card:hover.eff    { border-color: rgba(16,185,129,0.4);   box-shadow: 0 8px 25px rgba(16,185,129,0.12); }
-
-        .metric-icon { font-size: 26px; margin-bottom: 10px; }
-        .metric-card.volt  .metric-icon { color: var(--cyan);    filter: drop-shadow(0 0 6px rgba(56,189,248,0.4)); }
-        .metric-card.curr  .metric-icon { color: var(--violet);  filter: drop-shadow(0 0 6px rgba(129,140,248,0.4)); }
-        .metric-card.power .metric-icon { color: var(--amber);   filter: drop-shadow(0 0 6px rgba(245,158,11,0.4)); }
-        .metric-card.temp  .metric-icon { color: var(--rose);    filter: drop-shadow(0 0 6px rgba(244,63,94,0.4)); }
-        .metric-card.lux   .metric-icon { color: var(--yellow);  filter: drop-shadow(0 0 6px rgba(251,191,36,0.4)); }
-        .metric-card.eff   .metric-icon { color: var(--emerald); filter: drop-shadow(0 0 6px rgba(16,185,129,0.4)); }
-
-        .metric-label {
-            font-size: 10px; font-family: var(--font-mono);
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        .metric-value {
-            font-family: var(--font-mono); font-size: 28px; font-weight: 700;
-            color: var(--text-primary); line-height: 1;
-            margin-bottom: 6px;
-        }
-        .metric-sub {
-            font-size: 11px; font-family: var(--font-mono);
-            color: var(--text-secondary);
-        }
-
-        /* CHARTS */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            height: 260px;
-            display: flex; flex-direction: column;
-        }
-
-        .chart-card .chart-title {
-            font-size: 11px; font-family: var(--font-mono);
-            color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .chart-card canvas { flex: 1; min-height: 0; }
-
-        /* FOOTER STATUS BAR */
-        .status-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px 20px;
-            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-            font-family: var(--font-mono); font-size: 12px;
-        }
-
-        .status-items { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
-        .status-item { display: flex; align-items: center; gap: 6px; }
-        .status-dot-live {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--emerald);
-            box-shadow: 0 0 8px var(--emerald);
-            animation: liveDot 2s ease-in-out infinite;
-        }
-        @keyframes liveDot {
-            0%,100% { opacity: 1; box-shadow: 0 0 8px var(--emerald); }
-            50%      { opacity: 0.5; box-shadow: 0 0 3px var(--emerald); }
-        }
-        .status-dot-live.dead {
-            background: var(--rose); box-shadow: 0 0 8px var(--rose);
-            animation: none;
-        }
-
-        /* ══════════════════════════════════════
-           PAGE 2 — SENSOR STATUS
-        ══════════════════════════════════════ */
-        .sensors-header {
-            display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-        }
-        .sensors-header h2 { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-        .sensors-header p { font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 2px; }
-
-        .sensor-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        .sensor-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px 20px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        .sensor-card.online  { border-color: rgba(16,185,129,0.3); }
-        .sensor-card.offline { border-color: rgba(244,63,94,0.3); }
-        .sensor-card.warning { border-color: rgba(245,158,11,0.3); }
-
-        .sensor-card::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            transform: translate(30px, -30px);
-            opacity: 0.08;
-        }
-        .sensor-card.online::after  { background: var(--emerald); }
-        .sensor-card.offline::after { background: var(--rose); }
-        .sensor-card.warning::after { background: var(--amber); }
-
-        .sensor-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .sensor-name { font-size: 16px; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
-        .sensor-type { font-size: 11px; color: var(--text-secondary); margin-top: 3px; font-family: var(--font-mono); }
-
-        .sensor-badge {
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-        }
-        .badge-online  { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
-        .badge-offline { background: rgba(244,63,94,0.15);  color: var(--rose);    border: 1px solid rgba(244,63,94,0.3); }
-        .badge-warning { background: rgba(245,158,11,0.15); color: var(--amber);   border: 1px solid rgba(245,158,11,0.3); }
-
-        .sensor-metrics { display: flex; flex-direction: column; gap: 8px; }
-        .sensor-metric-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 12px;
-            background: rgba(5,11,24,0.5);
-            border-radius: 8px; font-family: var(--font-mono); font-size: 12px;
-        }
-        .sensor-metric-row .sm-key { color: var(--text-secondary); }
-        .sensor-metric-row .sm-val { color: var(--text-primary); font-weight: 600; }
-
-        .sensor-i2c {
-            margin-top: 14px;
-            padding: 8px 12px;
-            background: rgba(56,189,248,0.05);
-            border: 1px solid rgba(56,189,248,0.1);
-            border-radius: 8px;
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--cyan);
-            display: flex; justify-content: space-between;
-        }
-
-        /* ══════════════════════════════════════
-           PAGE 3 — ERROR HISTORY
-        ══════════════════════════════════════ */
-        .error-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-        }
-        .error-header h2 { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-        .error-header p  { font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 3px; }
-
-        .btn-clear-errors {
-            padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s;
-            background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);
-            color: var(--rose); font-family: var(--font-mono); font-size: 12px;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .btn-clear-errors:hover { background: rgba(244,63,94,0.2); }
-
-        .error-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px; margin-bottom: 20px;
-        }
-
-        .err-stat-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 16px; text-align: center;
-        }
-        .err-stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
-        .err-stat-lbl { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px; }
-
-        .error-log-container {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); overflow: hidden;
-        }
-
-        .error-log-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-            display: grid;
-            grid-template-columns: 160px 120px 1fr 120px;
-            gap: 12px;
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        #error-log-body { max-height: 380px; overflow-y: auto; }
-        #error-log-body::-webkit-scrollbar { width: 4px; }
-        #error-log-body::-webkit-scrollbar-track { background: transparent; }
-        #error-log-body::-webkit-scrollbar-thumb { background: var(--border-hot); border-radius: 4px; }
-
-        .error-row {
-            padding: 12px 20px;
-            display: grid;
-            grid-template-columns: 160px 120px 1fr 120px;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-family: var(--font-mono); font-size: 12px;
-            transition: 0.2s;
-            align-items: center;
-        }
-        .error-row:hover { background: rgba(56,189,248,0.03); }
-        .error-row:last-child { border-bottom: none; }
-
-        .err-time { color: var(--text-secondary); }
-        .err-device { color: var(--cyan); font-weight: 600; }
-        .err-msg { color: var(--text-primary); }
-        .err-level { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-align: center; }
-        .level-critical { background: rgba(244,63,94,0.15); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
-        .level-warning  { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-        .level-info     { background: rgba(56,189,248,0.1);  color: var(--cyan);  border: 1px solid rgba(56,189,248,0.2); }
-
-        .no-errors {
-            padding: 60px 20px; text-align: center;
-            font-family: var(--font-mono); color: var(--text-secondary);
-        }
-        .no-errors i { font-size: 40px; color: var(--emerald); margin-bottom: 14px; display: block; filter: drop-shadow(0 0 10px rgba(16,185,129,0.4)); }
-
-        /* ══════════════════════════════════════
-           BOTTOM NAVIGATION
-        ══════════════════════════════════════ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: var(--nav-h);
-            background: rgba(5, 11, 24, 0.96);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-around;
-            z-index: 50;
-            padding: 0 8px;
-        }
-
-        .nav-tab {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; padding: 8px; cursor: pointer; border-radius: 12px;
-            transition: all 0.25s; position: relative; user-select: none;
-            border: none; background: transparent;
-        }
-
-        .nav-tab i { font-size: 18px; color: var(--text-dim); transition: 0.25s; }
-        .nav-tab span { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); transition: 0.25s; letter-spacing: 0.5px; }
-
-        .nav-tab.active { background: rgba(56,189,248,0.08); }
-        .nav-tab.active i   { color: var(--cyan); filter: drop-shadow(0 0 8px rgba(56,189,248,0.5)); }
-        .nav-tab.active span { color: var(--cyan); }
-
-        .nav-tab.active::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 20%; right: 20%;
-            height: 2px; border-radius: 0 0 4px 4px;
-            background: var(--cyan);
-            box-shadow: 0 0 10px var(--cyan);
-        }
-
-        .nav-tab:hover:not(.active) { background: rgba(56,189,248,0.04); }
-        .nav-tab:hover:not(.active) i { color: var(--text-secondary); }
-
-        /* Badge for error count */
-        .nav-badge {
-            position: absolute; top: 6px; right: calc(50% - 18px);
-            background: var(--rose); color: #fff;
-            font-size: 10px; font-weight: 700; font-family: var(--font-mono);
-            width: 16px; height: 16px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 1.5px solid var(--bg-deep);
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-hot); border-radius: 4px; }
-
-        /* Responsive tweaks */
-        @media (max-width: 600px) {
-            .header-left h1 { display: none; }
-            .realtime-clock { font-size: 16px; }
-            .error-log-header,
-            .error-row { grid-template-columns: 120px 90px 1fr; }
-            .error-row .err-level, .error-log-header > *:last-child { display: none; }
-        }
+        .footer-status .status-left { display: flex; gap: 25px; flex-wrap: wrap; }
+        .footer-status span { display: flex; align-items: center; gap: 8px; }
+        .angle-val { font-weight: 600; }
     </style>
 </head>
 <body>
 
-<!-- ══════════ LOGIN ══════════ -->
-<div id="login-screen">
-    <div class="login-box">
-        <div class="login-logo">
-            <div class="icon-ring"><i class="fa-solid fa-solar-panel"></i></div>
-            <h2>GIÁM SÁT NĂNG LƯỢNG MẶT TRỜI</h2>
-            <p>// Hệ thống giám sát năng lượng mặt trời</p>
-        </div>
-        <div class="input-wrap">
-            <label>Tài khoản</label>
+    <div id="login-screen" class="glass-panel">
+        <h2><i class="fa-solid fa-solar-panel"></i>T-Digital Solar</h2>
+        <div class="input-group">
+            <label>Tài khoản hệ thống:</label>
             <input type="text" id="txt-username" placeholder="Nhập tài khoản...">
         </div>
-        <div class="input-wrap">
-            <label>Mật khẩu</label>
+        <div class="input-group">
+            <label>Mật khẩu mật mã:</label>
             <input type="password" id="txt-password" placeholder="Nhập mật khẩu...">
         </div>
         <button id="btn-login" onclick="handleLogin()">VÀO HỆ THỐNG</button>
-        <p id="login-error"><i class="fa-solid fa-circle-exclamation"></i> Thông tin đăng nhập chưa đúng!</p>
-    </div>
-</div>
-
-<!-- ══════════ APP ══════════ -->
-<div id="app">
-
-    <header class="app-header">
-        <div class="header-left">
-            <i class="fa-solid fa-bolt-lightning logo-icon"></i>
-            <div>
-                <h1>HỆ THỐNG GIÁM SÁT TOÀN DIỆN NĂNG LƯỢNG MẶT TRỜI</h1>
-            </div>
-        </div>
-        <div class="header-center">
-            <div class="realtime-clock" id="clock">00:00:00</div>
-            <div class="realtime-date" id="clock-date">--/--/----</div>
-        </div>
-        <div class="header-right">
-            <button class="btn-sm btn-excel" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
-            <button class="btn-sm btn-logout" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>
-        </div>
-    </header>
-
-    <div id="device-alert-bar">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        CẢNH BÁO: MẤT KẾT NỐI VỚI THIẾT BỊ ESP32! (QUÁ THỜI GIAN ĐỒNG BỘ)
+        <p id="login-error">Thông tin đăng nhập chưa đúng, vui lòng thử lại!</p>
     </div>
 
-    <div class="page-content">
+    <div id="main-dashboard" class="glass-panel">
+        <div id="device-alert-bar">
+            <i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO: MẤT KẾT NỐI VỚI THIẾT BỊ ESP32! (QUÁ THỜI GIAN ĐỒNG BỘ)
+        </div>
 
-        <!-- PAGE 1: DASHBOARD -->
-        <div class="page active" id="page-dashboard">
-
-            <div class="cards-grid">
-                <div class="metric-card volt">
-                    <div class="metric-icon"><i class="fa-solid fa-car-battery"></i></div>
-                    <div class="metric-label">Điện Áp (U)</div>
-                    <div class="metric-value" id="dien-ap">0.0 V</div>
-                    <div class="metric-sub">Giới hạn: 240.0 V</div>
-                </div>
-                <div class="metric-card curr">
-                    <div class="metric-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                    <div class="metric-label">Dòng Điện (I)</div>
-                    <div class="metric-value" id="dong-dien">0.00 A</div>
-                    <div class="metric-sub">Giới hạn: 2.0 A</div>
-                </div>
-                <div class="metric-card power">
-                    <div class="metric-icon"><i class="fa-solid fa-plug"></i></div>
-                    <div class="metric-label">Công Suất Thực (P)</div>
-                    <div class="metric-value" id="cong-suat">0.0 W</div>
-                    <div class="metric-sub">Định mức pin: 50 W</div>
-                </div>
-                <div class="metric-card temp">
-                    <div class="metric-icon"><i class="fa-solid fa-temperature-half"></i></div>
-                    <div class="metric-label">Nhiệt Độ Pin</div>
-                    <div class="metric-value" id="nhiet-do">-- °C</div>
-                    <div class="metric-sub">Ngưỡng nóng: 45 °C</div>
-                </div>
-                <div class="metric-card lux">
-                    <div class="metric-icon"><i class="fa-solid fa-sun"></i></div>
-                    <div class="metric-label">Cường Độ Ánh Sáng</div>
-                    <div class="metric-value" id="cuong-do-sang">0 Lux</div>
-                    <div class="metric-sub" id="lbl-p-light">P_Light lý thuyết: 0.00 W</div>
-                </div>
-                <div class="metric-card eff">
-                    <div class="metric-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <div class="metric-label">Hiệu Suất Thực Tế</div>
-                    <div class="metric-value" id="hieu-suat-thuc">0.0%</div>
-                    <div class="metric-sub" id="hieu-suat-du-kien">Dự kiến (HSA): 0.0%</div>
-                </div>
+        <header>
+            <h1><i class="fa-solid fa-bolt-lightning"></i>HỆ THỐNG GIÁM SÁT TOÀN DIỆN NĂNG LƯỢNG MẶT TRỜI</h1>
+            <div class="header-buttons">
+                <button id="btn-excel" class="btn-action" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+                <button id="btn-logout" class="btn-action" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
             </div>
+        </header>
 
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-bolt" style="color:var(--cyan)"></i> Điện Áp U (V) — 2 giờ</div>
-                    <canvas id="chart-voltage"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-wave-square" style="color:var(--violet)"></i> Dòng Điện I (A) — 2 giờ</div>
-                    <canvas id="chart-current"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-chart-area" style="color:var(--amber)"></i> Công Suất P (W) — 2 giờ</div>
-                    <canvas id="chart-power"></canvas>
-                </div>
+        <div class="dashboard-layout">
+            <div class="card volt">
+                <i class="fa-solid fa-car-battery"></i>
+                <h3>Điện Áp (U)</h3>
+                <div class="value" id="dien-ap">0.0 V</div>
+                <div class="sub-value">Giới hạn: 240.0V</div>
             </div>
-
-            <div class="status-bar">
-                <div class="status-items">
-                    <div class="status-item">
-                        <i class="fa-solid fa-arrows-up-to-line" style="color:var(--cyan);font-size:13px"></i>
-                        <span style="color:var(--text-secondary);font-size:12px">Trục X (Nghiêng):</span>
-                        <span id="lbl-x" style="color:var(--cyan);font-weight:700">0°</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fa-solid fa-arrows-left-right" style="color:var(--violet);font-size:13px"></i>
-                        <span style="color:var(--text-secondary);font-size:12px">Trục Y (Xoay):</span>
-                        <span id="lbl-y" style="color:var(--violet);font-weight:700">0°</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fa-solid fa-cube" style="color:var(--indigo);font-size:13px"></i>
-                        <span style="color:var(--text-secondary);font-size:12px">Trục Z:</span>
-                        <span id="lbl-z-axis" style="color:var(--indigo);font-weight:700">0°</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fa-solid fa-cloud-sun" style="color:var(--amber);font-size:13px"></i>
-                        <span style="color:var(--text-secondary);font-size:12px">Môi trường:</span>
-                        <span id="lbl-z" style="color:var(--amber);font-weight:700">0°C</span>
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot-live" id="status-dot"></div>
-                    <span id="lbl-time" style="color:var(--emerald);font-size:12px">Đang kết nối</span>
-                </div>
+            <div class="card current">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+                <h3>Dòng Điện (I)</h3>
+                <div class="value" id="dong-dien">0.00 A</div>
+                <div class="sub-value">Giới hạn: 2.0A</div>
+            </div>
+            <div class="card power">
+                <i class="fa-solid fa-plug"></i>
+                <h3>Công Suất Thực (P)</h3>
+                <div class="value" id="cong-suat">0.0 W</div>
+                <div class="sub-value">Định mức pin: 50W</div>
+            </div>
+            <div class="card temp">
+                <i class="fa-solid fa-temperature-half"></i>
+                <h3>Nhiệt Độ Pin</h3>
+                <div class="value" id="nhiet-do">-- °C</div>
+                <div class="sub-value">Ngưỡng nóng: 45°C</div>
+            </div>
+            <div class="card lux">
+                <i class="fa-solid fa-sun"></i>
+                <h3>Cường Độ Ánh Sáng</h3>
+                <div class="value" id="cuong-do-sang">0 Lux</div>
+                <div class="sub-value" id="lbl-p-light">P_Light lý thuyết: 0.0 W</div>
+            </div>
+            <div class="card eff">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>Hiệu Suất Thực Tế</h3>
+                <div class="value" id="hieu-suat-thuc">0.0 %</div>
+                <div class="sub-value" id="hieu-suat-du-kien">Dự kiến (HSA): 0.0 %</div>
             </div>
         </div>
 
-        <!-- PAGE 2: SENSOR STATUS -->
-        <div class="page" id="page-sensors">
-            <div class="sensors-header">
-                <div>
-                    <h2><i class="fa-solid fa-microchip" style="color:var(--cyan);margin-right:10px"></i>Trạng Thái Cảm Biến</h2>
-                    <p>// Kết nối I²C & 1-Wire · Cập nhật tự động mỗi 3s</p>
-                </div>
+        <div class="charts-container">
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-bolt" style="color: #38bdf8;"></i> Đồ thị Điện Áp U (V)</h4>
+                <canvas id="chart-voltage"></canvas>
             </div>
-            <div class="sensor-grid" id="sensor-grid">
-                <!-- JS rendered -->
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-wave-square" style="color: #a855f7;"></i> Đồ thị Dòng Điện I (A)</h4>
+                <canvas id="chart-current"></canvas>
             </div>
-        </div>
-
-        <!-- PAGE 3: ERROR HISTORY -->
-        <div class="page" id="page-errors">
-            <div class="error-header">
-                <div>
-                    <h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--rose);margin-right:10px"></i>Lịch Sử Lỗi</h2>
-                    <p>// Nhật ký sự kiện & cảnh báo hệ thống</p>
-                </div>
-                <button class="btn-clear-errors" onclick="clearErrors()">
-                    <i class="fa-solid fa-trash"></i> Xóa lịch sử
-                </button>
-            </div>
-
-            <div class="error-stats">
-                <div class="err-stat-card">
-                    <div class="err-stat-num" id="stat-total" style="color:var(--text-primary)">0</div>
-                    <div class="err-stat-lbl">Tổng sự kiện</div>
-                </div>
-                <div class="err-stat-card">
-                    <div class="err-stat-num" id="stat-critical" style="color:var(--rose)">0</div>
-                    <div class="err-stat-lbl">Lỗi nghiêm trọng</div>
-                </div>
-                <div class="err-stat-card">
-                    <div class="err-stat-num" id="stat-warning" style="color:var(--amber)">0</div>
-                    <div class="err-stat-lbl">Cảnh báo</div>
-                </div>
-                <div class="err-stat-card">
-                    <div class="err-stat-num" id="stat-info" style="color:var(--cyan)">0</div>
-                    <div class="err-stat-lbl">Thông tin</div>
-                </div>
-            </div>
-
-            <div class="error-log-container">
-                <div class="error-log-header">
-                    <span>Thời gian</span>
-                    <span>Thiết bị</span>
-                    <span>Mô tả</span>
-                    <span>Mức độ</span>
-                </div>
-                <div id="error-log-body">
-                    <div class="no-errors">
-                        <i class="fa-solid fa-circle-check"></i>
-                        Không có lỗi nào được ghi nhận
-                    </div>
-                </div>
+            <div class="chart-box">
+                <h4><i class="fa-solid fa-chart-area" style="color: #f59e0b;"></i> Đồ thị Công Suất P (W)</h4>
+                <canvas id="chart-power"></canvas>
             </div>
         </div>
 
-    </div><!-- /page-content -->
+        <div class="footer-status">
+            <div class="status-left">
+                <span><i class="fa-solid fa-arrows-up-to-line" style="color: #38bdf8;"></i>Trục X (Góc Nghiêng): <span id="lbl-x" class="angle-val" style="color: #38bdf8;">0°</span></span>
+                <span><i class="fa-solid fa-arrows-left-right" style="color: #a855f7;"></i>Trục Y (Góc Xoay): <span id="lbl-y" class="angle-val" style="color: #a855f7;">0°</span></span>
+                <span><i class="fa-solid fa-cube" style="color: #6366f1;"></i>Trục Z (Cảm biến): <span id="lbl-z-axis" class="angle-val" style="color: #6366f1;">0°</span></span>
+                <span><i class="fa-solid fa-cloud-sun" style="color: #f59e0b;"></i>Nhiệt độ môi trường: <span id="lbl-z" class="angle-val" style="color: #f59e0b;">0°C</span></span>
+            </div>
+            <div class="status-right">
+                <span><i class="fa-solid fa-circle-dot" id="status-dot" style="color: #10b981;"></i> Trạng thái: <span id="lbl-time" style="color: #10b981;">Đang kết nối</span></span>
+            </div>
+        </div>
+    </div>
 
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav">
-        <button class="nav-tab active" id="nav-dashboard" onclick="switchPage('dashboard')">
-            <i class="fa-solid fa-gauge-high"></i>
-            <span>Dashboard</span>
-        </button>
-        <button class="nav-tab" id="nav-sensors" onclick="switchPage('sensors')">
-            <i class="fa-solid fa-microchip"></i>
-            <span>Cảm biến</span>
-        </button>
-        <button class="nav-tab" id="nav-errors" onclick="switchPage('errors')">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span>Lịch sử lỗi</span>
-            <div class="nav-badge" id="error-badge" style="display:none">0</div>
-        </button>
-    </nav>
+    <script>
+        const API_URL = "https://esp32-backend-vqfp.onrender.com/api/data";
+        let localDataLogs = []; 
+        let lastDataTimestamp = null; 
 
-</div><!-- /app -->
+        // Các biến cấu hình đối tượng đồ thị ChartJS
+        let chartU, chartI, chartP;
+        const MAX_CHART_POINTS = 10; // Số lượng điểm dữ liệu hiển thị tối đa trên đồ thị cuộn
 
-<script>
-// ═══════════════════════════════════════════════
-// CONSTANTS & STATE
-// ═══════════════════════════════════════════════
-const API_URL = "https://esp32-backend-vqfp.onrender.com/api/data";
-const MAX_CHART_POINTS = 120; // ~2 hours at 1 point/minute (or fill proportionally)
+        // HẰNG SỐ ĐỊNH MỨC AN TOÀN
+        const MAX_VOLTAGE = 240.0;
+        const MAX_CURRENT = 2.0;
+        const MAX_POWER = 350.0;
+        const MAX_TEMP = 45.0;
 
-let localDataLogs = [];
-let lastDataTimestamp = null;
-let chartU, chartI, chartP;
-let errorLogs = [];
-let errorBadgeCount = 0;
+        // KHI TRANG TẢI XONG - KHỞI TẠO ĐỒ THỊ TRƯỚC
+        document.addEventListener("DOMContentLoaded", () => {
+            initCharts();
+            if (document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
+        });
 
-// Sensor definitions
-const SENSORS = [
-    {
-        id: 'INA226',
-        name: 'INA226',
-        type: 'Cảm biến dòng/áp — I²C',
-        address: '0x40',
-        fields: ['Điện áp (U)', 'Dòng điện (I)', 'Công suất (P)'],
-        fieldIds: ['dien_ap', 'dong_dien', 'cong_suat'],
-        fieldSuffix: ['V', 'A', 'W'],
-        color: 'var(--cyan)'
-    },
-    {
-        id: 'VEML7700',
-        name: 'VEML7700',
-        type: 'Cảm biến ánh sáng — I²C',
-        address: '0x10',
-        fields: ['Cường độ sáng'],
-        fieldIds: ['anh_sang'],
-        fieldSuffix: ['Lux'],
-        color: 'var(--yellow)'
-    },
-    {
-        id: 'MPU6050',
-        name: 'MPU6050',
-        type: 'Cảm biến gia tốc/góc — I²C',
-        address: '0x68',
-        fields: ['Góc nghiêng X', 'Góc xoay Y'],
-        fieldIds: ['goc_x', 'goc_y'],
-        fieldSuffix: ['°', '°'],
-        color: 'var(--violet)'
-    },
-    {
-        id: 'DS18B20',
-        name: 'DS18B20',
-        type: 'Cảm biến nhiệt độ — 1-Wire',
-        address: 'GPIO 4',
-        fields: ['Nhiệt độ pin'],
-        fieldIds: ['nhiet_do'],
-        fieldSuffix: ['°C'],
-        color: 'var(--rose)'
-    }
-];
+        // --- HÀM KHỞI TẠO CHART.JS ---
+        function initCharts() {
+            const chartOptions = (color) => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            });
 
-// ═══════════════════════════════════════════════
-// CLOCK
-// ═══════════════════════════════════════════════
-function updateClock() {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2,'0');
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-    const dd = String(now.getDate()).padStart(2,'0');
-    const mo = String(now.getMonth()+1).padStart(2,'0');
-    const yy = now.getFullYear();
-    const days = ['CN','T2','T3','T4','T5','T6','T7'];
-    document.getElementById('clock-date').textContent = `${days[now.getDay()]} ${dd}/${mo}/${yy}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+            chartU = new Chart(document.getElementById('chart-voltage').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#38bdf8')
+            });
 
-// ═══════════════════════════════════════════════
-// PAGE NAVIGATION
-// ═══════════════════════════════════════════════
-function switchPage(page) {
-    ['dashboard','sensors','errors'].forEach(p => {
-        document.getElementById('page-'+p).classList.remove('active');
-        document.getElementById('nav-'+p).classList.remove('active');
-    });
-    document.getElementById('page-'+page).classList.add('active');
-    document.getElementById('nav-'+page).classList.add('active');
+            chartI = new Chart(document.getElementById('chart-current').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#a855f7', backgroundColor: 'rgba(168,85,247,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#a855f7')
+            });
 
-    if (page === 'errors') {
-        errorBadgeCount = 0;
-        updateErrorBadge();
-    }
-    if (page === 'sensors') renderSensorGrid();
-}
+            chartP = new Chart(document.getElementById('chart-power').getContext('2d'), {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3, fill: true }] },
+                options: chartOptions('#f59e0b')
+            });
+        }
 
-// ═══════════════════════════════════════════════
-// LOGIN / LOGOUT
-// ═══════════════════════════════════════════════
-function handleLogin() {
-    const u = document.getElementById('txt-username').value.trim();
-    const p = document.getElementById('txt-password').value.trim();
-    const errEl = document.getElementById('login-error');
-    if (u === 'tanvippro' && p === '123456') {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        initCharts();
-        addErrorLog('INFO', 'Hệ thống', 'Đăng nhập thành công — user: ' + u);
-        loadSolarData();
-        setInterval(loadSolarData, 3000);
-        setInterval(checkDeviceConnection, 2000);
-    } else {
-        errEl.style.display = 'block';
-    }
-}
+        // --- CẬP NHẬT DỮ LIỆU ĐỒ THỊ ---
+        function updateChartsRealtime(timeLabel, uVal, iVal, pVal) {
+            [chartU, chartI, chartP].forEach(chart => {
+                if (chart.data.labels.length >= MAX_CHART_POINTS) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+            });
 
-function handleLogout() {
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('txt-username').value = '';
-    document.getElementById('txt-password').value = '';
-    document.getElementById('login-error').style.display = 'none';
-}
+            chartU.data.labels.push(timeLabel); chartU.data.datasets[0].data.push(uVal); chartU.update();
+            chartI.data.labels.push(timeLabel); chartI.data.datasets[0].data.push(iVal); chartI.update();
+            chartP.data.labels.push(timeLabel); chartP.data.datasets[0].data.push(pVal); chartP.update();
+        }
 
-// ═══════════════════════════════════════════════
-// CHARTS INIT
-// ═══════════════════════════════════════════════
-function initCharts() {
-    const opts = (color) => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 300 },
-        plugins: { legend: { display: false } },
-        scales: {
-            x: {
-                ticks: { color: '#475569', font: { size: 9, family: 'JetBrains Mono' }, maxTicksLimit: 8 },
-                grid: { display: false },
-                border: { color: 'rgba(255,255,255,0.05)' }
-            },
-            y: {
-                ticks: { color: '#475569', font: { size: 10, family: 'JetBrains Mono' } },
-                grid: { color: 'rgba(255,255,255,0.04)' },
-                border: { color: 'rgba(255,255,255,0.05)' }
+        // --- HÀM XỬ LÝ ĐĂNG NHẬP ---
+        function handleLogin() {
+            const userField = document.getElementById("txt-username");
+            const passField = document.getElementById("txt-password");
+            const loginError = document.getElementById("login-error");
+
+            const taiKhoan = userField ? userField.value.trim() : "";
+            const matKhau = passField ? passField.value.trim() : "";
+
+            if (taiKhoan === "tanvippro" && matKhau === "123456") {
+                alert("Đăng nhập thành công!");
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-dashboard").style.display = "block";
+                
+                loadSolarData(); 
+                setInterval(loadSolarData, 3000); 
+                setInterval(checkDeviceConnection, 2000); 
+            } else {
+                if (loginError) loginError.style.display = "block";
             }
         }
-    });
 
-    chartU = new Chart(document.getElementById('chart-voltage').getContext('2d'), {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#38bdf8')
-    });
-
-    chartI = new Chart(document.getElementById('chart-current').getContext('2d'), {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#818cf8', backgroundColor: 'rgba(129,140,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#818cf8')
-    });
-
-    chartP = new Chart(document.getElementById('chart-power').getContext('2d'), {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#f59e0b')
-    });
-}
-
-function updateChartsRealtime(timeLabel, uVal, iVal, pVal) {
-    [chartU, chartI, chartP].forEach(chart => {
-        if (chart.data.labels.length >= MAX_CHART_POINTS) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
+        function handleLogout() {
+            document.getElementById("main-dashboard").style.display = "none";
+            document.getElementById("login-screen").style.display = "block";
+            document.getElementById("txt-username").value = "";
+            document.getElementById("txt-password").value = "";
+            if(document.getElementById("login-error")) document.getElementById("login-error").style.display = "none";
         }
-    });
-    chartU.data.labels.push(timeLabel); chartU.data.datasets[0].data.push(uVal); chartU.update('none');
-    chartI.data.labels.push(timeLabel); chartI.data.datasets[0].data.push(iVal); chartI.update('none');
-    chartP.data.labels.push(timeLabel); chartP.data.datasets[0].data.push(pVal); chartP.update('none');
-}
 
-// ═══════════════════════════════════════════════
-// DATA FETCH
-// ═══════════════════════════════════════════════
-function loadSolarData() {
-    fetch(API_URL)
-        .then(r => { if (!r.ok) throw new Error('API Error'); return r.json(); })
-        .then(data => {
-            if (data && data.length > 0) {
-                localDataLogs = data;
-                const latest = data[data.length - 1];
-                lastDataTimestamp = Date.now();
+        // --- HÀM ĐỒNG BỘ DỮ LIỆU TỪ API RENDER ---
+        function loadSolarData() {
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi đường truyền API Backend!");
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Dữ liệu Solar nhận thành công:", data);
+                    if (data && data.length > 0) {
+                        localDataLogs = data; 
+                        const latest = data[data.length - 1]; 
 
-                const uVal   = latest.dien_ap   ?? 0;
-                const iVal   = latest.dong_dien ?? 0;
-                const pVal   = latest.cong_suat ?? 0;
-                const tempVal= latest.nhiet_do  ?? 0;
-                const luxVal = latest.anh_sang  ?? 0;
+                        lastDataTimestamp = new Date().getTime(); 
 
-                document.getElementById('dien-ap').textContent    = uVal.toFixed(1)  + ' V';
-                document.getElementById('dong-dien').textContent  = iVal.toFixed(2)  + ' A';
-                document.getElementById('cong-suat').textContent  = pVal.toFixed(1)  + ' W';
-                document.getElementById('nhiet-do').textContent   = tempVal + ' °C';
-                document.getElementById('cuong-do-sang').textContent = luxVal + ' Lux';
+                        // Đổ dữ liệu cơ bản lên Card
+                        const uVal = latest.dien_ap !== undefined ? latest.dien_ap : 0;
+                        const iVal = latest.dong_dien !== undefined ? latest.dong_dien : 0;
+                        const pVal = latest.cong_suat !== undefined ? latest.cong_suat : 0;
+                        const tempVal = latest.nhiet_do !== undefined ? latest.nhiet_do : 0;
+                        const luxVal = latest.anh_sang !== undefined ? latest.anh_sang : 0;
 
-                // Efficiency
-                const P_Light = luxVal * 0.0079;
-                document.getElementById('lbl-p-light').textContent = 'P_Light lý thuyết: ' + P_Light.toFixed(2) + ' W';
+                        document.getElementById("dien-ap").innerText = uVal.toFixed(1) + " V";
+                        document.getElementById("dong-dien").innerText = iVal.toFixed(2) + " A";
+                        document.getElementById("cong-suat").innerText = pVal.toFixed(1) + " W";
+                        document.getElementById("nhiet-do").innerText = tempVal + " °C";
+                        document.getElementById("cuong-do-sang").innerText = luxVal + " Lux";
 
-                const hieuSuatThuc = P_Light > 0 ? ((pVal / P_Light) * 100) : 0;
-                document.getElementById('hieu-suat-thuc').textContent = hieuSuatThuc.toFixed(1) + '%';
+                        // LOGIC TÍNH TOÁN HIỆU SUẤT THEO CÔNG THỨC THỰC TẾ
+                        const p_dinh_muc = 50; // Công suất định mức tấm pin 50W
+                        const P_Light = luxVal * 0.0079; // Quy đổi Lux sang Watt lý thuyết hệ thống
+                        document.getElementById("lbl-p-light").innerText = "P_Light lý thuyết: " + P_Light.toFixed(2) + " W";
 
-                const hieuSuatDK = Math.min(95.5, hieuSuatThuc * 1.15 + 2.5);
-                document.getElementById('hieu-suat-du-kien').textContent = 'Dự kiến (HSA): ' + hieuSuatDK.toFixed(1) + '%';
+                        // Hiệu suất thực tế = (P_Thuc / P_Light) * 100
+                        const hieu_suat_thuc = P_Light > 0 ? ((pVal / P_Light) * 100) : 0;
+                        document.getElementById("hieu-suat-thuc").innerText = hieu_suat_thuc.toFixed(1) + " %";
 
-                // Angles
-                const gocX = latest.goc_x ?? 0;
-                const gocY = latest.goc_y ?? 0;
-                const gocZ = Math.abs(gocX - gocY);
-                document.getElementById('lbl-x').textContent = gocX + '°';
-                document.getElementById('lbl-y').textContent = gocY + '°';
-                document.getElementById('lbl-z-axis').textContent = gocZ + '°';
-                document.getElementById('lbl-z').textContent = tempVal + '°C';
+                        // Hiệu suất dự kiến (Giả lập thuật toán tối ưu hóa góc dựa theo góc trục X, Y hiện tại)
+                        const hieu_suat_du_kien = Math.min(95.5, parseFloat((hieu_suat_thuc * 1.15) + 2.5));
+                        document.getElementById("hieu-suat-du-kien").innerText = "Dự kiến (HSA): " + hieu_suat_du_kien.toFixed(1) + " %";
 
-                // Threshold alerts
-                checkThresholds(uVal, iVal, pVal, tempVal);
+                        // Đổ dữ liệu góc trục XYZ (Tích hợp thêm Trục Z giả lập từ độ lệch gia tốc hoặc góc xoay bổ trợ)
+                        const gocX = latest.goc_x !== undefined ? latest.goc_x : 0;
+                        const gocY = latest.goc_y !== undefined ? latest.goc_y : 0;
+                        const gocZ = Math.abs(gocX - gocY); // Logic tính trục bổ trợ Z
 
-                const timeLabel = latest.created_at
-                    ? latest.created_at.split('T')[1].substring(0,8)
-                    : new Date().toLocaleTimeString('vi-VN');
-                updateChartsRealtime(timeLabel, uVal, iVal, pVal);
+                        if(document.getElementById("lbl-x")) document.getElementById("lbl-x").innerText = gocX + "°";
+                        if(document.getElementById("lbl-y")) document.getElementById("lbl-y").innerText = gocY + "°";
+                        if(document.getElementById("lbl-z-axis")) document.getElementById("lbl-z-axis").innerText = gocZ + "°";
+                        if(document.getElementById("lbl-z")) document.getElementById("lbl-z").innerText = tempVal + "°C";
+
+                        // Đẩy dữ liệu thời gian thực vào 3 biểu đồ đồ thị
+                        const timeLabel = latest.created_at ? latest.created_at.split("T")[1].substring(0, 8) : new Date().toLocaleTimeString();
+                        updateChartsRealtime(timeLabel, uVal, iVal, pVal);
+                    }
+                })
+                .catch(error => console.error("Lỗi đồng bộ dữ liệu Render:", error));
+        }
+
+        // --- LOGIC TỰ ĐỘNG PHÁT HIỆN LỖI MẤT KẾT NỐI ESP32 ---
+        function checkDeviceConnection() {
+            if (lastDataTimestamp === null) return; 
+
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - lastDataTimestamp) / 1000; 
+
+            const alertBar = document.getElementById("device-alert-bar");
+            const statusDot = document.getElementById("status-dot");
+            const lblTime = document.getElementById("lbl-time");
+
+            if (timeDifference > 7) { 
+                if (alertBar) alertBar.style.display = "block"; 
+                if (statusDot) statusDot.style.color = "#ef4444"; 
+                if (lblTime) {
+                    lblTime.innerText = "MẤT KẾT NỐI (Quá 7s)";
+                    lblTime.style.color = "#ef4444";
+                }
+            } else {
+                if (alertBar) alertBar.style.display = "none";
+                if (statusDot) statusDot.style.color = "#10b981";
+                if (lblTime) {
+                    lblTime.innerText = "Đang kết nối";
+                    lblTime.style.color = "#10b981";
+                }
             }
-        })
-        .catch(err => {
-            console.error('API Error:', err);
-            addErrorLog('CRITICAL', 'ESP32', 'Mất kết nối API Backend — ' + err.message);
-        });
-}
-
-// ═══════════════════════════════════════════════
-// DEVICE CONNECTION CHECK
-// ═══════════════════════════════════════════════
-let lastAlertState = false;
-function checkDeviceConnection() {
-    if (lastDataTimestamp === null) return;
-    const diff = (Date.now() - lastDataTimestamp) / 1000;
-    const alert = diff > 7;
-    const alertBar = document.getElementById('device-alert-bar');
-    const dot      = document.getElementById('status-dot');
-    const lbl      = document.getElementById('lbl-time');
-
-    alertBar.style.display = alert ? 'block' : 'none';
-    dot.className = 'status-dot-live' + (alert ? ' dead' : '');
-    lbl.textContent = alert ? 'MẤT KẾT NỐI (>' + Math.floor(diff) + 's)' : 'Đang kết nối';
-    lbl.style.color = alert ? 'var(--rose)' : 'var(--emerald)';
-
-    if (alert && !lastAlertState) {
-        addErrorLog('CRITICAL', 'ESP32', 'Mất kết nối thiết bị — không nhận được dữ liệu > 7 giây');
-    }
-    lastAlertState = alert;
-}
-
-// ═══════════════════════════════════════════════
-// THRESHOLD ALERTS
-// ═══════════════════════════════════════════════
-let lastThresholdCheck = {};
-function checkThresholds(u, i, p, t) {
-    const now = Date.now();
-    const checks = [
-        { key: 'temp', cond: t > 45, dev: 'DS18B20', msg: `Nhiệt độ pin vượt ngưỡng: ${t}°C (>45°C)`, level: 'WARNING' },
-        { key: 'volt', cond: u > 240, dev: 'INA226',  msg: `Điện áp vượt ngưỡng: ${u.toFixed(1)}V (>240V)`, level: 'CRITICAL' },
-        { key: 'curr', cond: i > 2,   dev: 'INA226',  msg: `Dòng điện vượt ngưỡng: ${i.toFixed(2)}A (>2A)`,  level: 'WARNING' },
-    ];
-    checks.forEach(c => {
-        if (c.cond && (!lastThresholdCheck[c.key] || now - lastThresholdCheck[c.key] > 30000)) {
-            addErrorLog(c.level, c.dev, c.msg);
-            lastThresholdCheck[c.key] = now;
         }
-    });
-}
 
-// ═══════════════════════════════════════════════
-// ERROR LOG
-// ═══════════════════════════════════════════════
-function addErrorLog(level, device, msg) {
-    const now = new Date();
-    const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}`;
-    errorLogs.unshift({ time: ts, device, msg, level });
-    if (errorLogs.length > 200) errorLogs.pop();
+        // --- HÀM XUẤT FILE EXCEL BÁO CÁO ĐẦY ĐỦ THÔNG SỐ NÂNG CAO ---
+        function exportToExcel() {
+            if (localDataLogs.length === 0) {
+                alert("Không có dữ liệu lịch sử logs để xuất file!");
+                return;
+            }
+            try {
+                const formattedData = localDataLogs.map((item, index) => {
+                    const P_Thuc = item.cong_suat || 0;
+                    const p_dinh_muc = 50; 
+                    const P_Light = (item.anh_sang || 0) * 0.0079; 
+                    const hieu_suat = P_Light > 0 ? ((P_Thuc / P_Light) * 100).toFixed(1) : 0;
+                    const hieu_suat_dk = Math.min(95.5, parseFloat((hieu_suat * 1.15) + 2.5)).toFixed(1);
 
-    // Badge (only when not on error page)
-    const activePage = document.querySelector('.page.active');
-    if (!activePage || activePage.id !== 'page-errors') {
-        errorBadgeCount++;
-        updateErrorBadge();
-    }
-    renderErrorLog();
-}
+                    return {
+                        "STT": index + 1,
+                        "Điện Áp U (V)": item.dien_ap,
+                        "Dòng Điện I (A)": item.dong_dien,
+                        "Công Suất Thực P (W)": P_Thuc,
+                        "Công Suất Định Mức (W)": p_dinh_muc,
+                        "Cường Độ Sáng (Lux)": item.anh_sang,
+                        "Hiệu Suất Thực Tính (%)": hieu_suat,
+                        "Hiệu Suất Dự Kiến (%)": hieu_suat_dk,
+                        "Nhiệt Độ Pin (°C)": item.nhiet_do,
+                        "Góc Trục X": item.goc_x,
+                        "Góc Trục Y": item.goc_y,
+                        "Góc Trục Z (Tính toán)": Math.abs((item.goc_x || 0) - (item.goc_y || 0)),
+                        "Thời Gian Ghi Nhận": item.created_at
+                    };
+                });
 
-function updateErrorBadge() {
-    const badge = document.getElementById('error-badge');
-    if (errorBadgeCount > 0) {
-        badge.style.display = 'flex';
-        badge.textContent = errorBadgeCount > 99 ? '99+' : errorBadgeCount;
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
-function renderErrorLog() {
-    const body = document.getElementById('error-log-body');
-    const total    = errorLogs.length;
-    const critical = errorLogs.filter(e => e.level === 'CRITICAL').length;
-    const warning  = errorLogs.filter(e => e.level === 'WARNING').length;
-    const info     = errorLogs.filter(e => e.level === 'INFO').length;
-
-    document.getElementById('stat-total').textContent    = total;
-    document.getElementById('stat-critical').textContent = critical;
-    document.getElementById('stat-warning').textContent  = warning;
-    document.getElementById('stat-info').textContent     = info;
-
-    if (total === 0) {
-        body.innerHTML = `<div class="no-errors"><i class="fa-solid fa-circle-check"></i>Không có lỗi nào được ghi nhận</div>`;
-        return;
-    }
-
-    const levelClass = { CRITICAL: 'level-critical', WARNING: 'level-warning', INFO: 'level-info' };
-    body.innerHTML = errorLogs.map(e => `
-        <div class="error-row">
-            <span class="err-time">${e.time}</span>
-            <span class="err-device">${e.device}</span>
-            <span class="err-msg">${e.msg}</span>
-            <span class="err-level ${levelClass[e.level] || 'level-info'}">${e.level}</span>
-        </div>
-    `).join('');
-}
-
-function clearErrors() {
-    if (!confirm('Xóa toàn bộ lịch sử lỗi?')) return;
-    errorLogs = [];
-    errorBadgeCount = 0;
-    updateErrorBadge();
-    renderErrorLog();
-}
-
-// ═══════════════════════════════════════════════
-// SENSOR STATUS PAGE
-// ═══════════════════════════════════════════════
-function renderSensorGrid() {
-    const latest = localDataLogs.length > 0 ? localDataLogs[localDataLogs.length - 1] : null;
-    const isConnected = lastDataTimestamp !== null && (Date.now() - lastDataTimestamp) < 7000;
-
-    const grid = document.getElementById('sensor-grid');
-    grid.innerHTML = SENSORS.map(s => {
-        const hasData = latest !== null;
-        const status  = !isConnected ? 'offline' : (hasData ? 'online' : 'warning');
-        const badgeText = { online: 'ONLINE', offline: 'OFFLINE', warning: 'CHỜ DỮ LIỆU' }[status];
-        const badgeClass= { online: 'badge-online', offline: 'badge-offline', warning: 'badge-warning' }[status];
-
-        const rows = s.fields.map((f, idx) => {
-            const rawVal = latest ? (latest[s.fieldIds[idx]] ?? '--') : '--';
-            const val = (rawVal !== '--' && rawVal !== null) ? rawVal : '--';
-            return `
-                <div class="sensor-metric-row">
-                    <span class="sm-key">${f}</span>
-                    <span class="sm-val" style="color:${s.color}">${val !== '--' ? Number(val).toFixed(2) + ' ' + s.fieldSuffix[idx] : '--'}</span>
-                </div>`;
-        }).join('');
-
-        return `
-        <div class="sensor-card ${status}">
-            <div class="sensor-top">
-                <div>
-                    <div class="sensor-name" style="color:${s.color}">${s.name}</div>
-                    <div class="sensor-type">${s.type}</div>
-                </div>
-                <span class="sensor-badge ${badgeClass}">${badgeText}</span>
-            </div>
-            <div class="sensor-metrics">${rows}</div>
-            <div class="sensor-i2c">
-                <span>Địa chỉ / Chân:</span>
-                <span>${s.address}</span>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-// ═══════════════════════════════════════════════
-// EXCEL EXPORT
-// ═══════════════════════════════════════════════
-function exportToExcel() {
-    if (!localDataLogs.length) { alert('Không có dữ liệu để xuất!'); return; }
-    try {
-        const rows = localDataLogs.map((item, i) => {
-            const P = item.cong_suat || 0;
-            const P_Light = (item.anh_sang || 0) * 0.0079;
-            const hs = P_Light > 0 ? (P / P_Light * 100).toFixed(1) : 0;
-            const hsDK = Math.min(95.5, parseFloat(hs) * 1.15 + 2.5).toFixed(1);
-            return {
-                'STT': i + 1,
-                'Điện Áp U (V)': item.dien_ap,
-                'Dòng Điện I (A)': item.dong_dien,
-                'Công Suất P (W)': P,
-                'Định Mức (W)': 50,
-                'Ánh Sáng (Lux)': item.anh_sang,
-                'P_Light LT (W)': P_Light.toFixed(2),
-                'Hiệu Suất Thực (%)': hs,
-                'Hiệu Suất DK (%)': hsDK,
-                'Nhiệt Độ (°C)': item.nhiet_do,
-                'Góc X': item.goc_x,
-                'Góc Y': item.goc_y,
-                'Góc Z': Math.abs((item.goc_x||0) - (item.goc_y||0)),
-                'Thời Gian': item.created_at
-            };
-        });
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Solar_Data');
-        XLSX.writeFile(wb, 'BaoCao_Solar_T_Digital.xlsx');
-    } catch(e) { alert('Lỗi xuất Excel: ' + e.message); }
-}
-
-// ENTER key on login
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('txt-password').addEventListener('keydown', e => {
-        if (e.key === 'Enter') handleLogin();
-    });
-});
-</script>
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Solar_Advanced_Data");
+                XLSX.writeFile(workbook, "BaoCao_ToanDien_Solar_T_Digital.xlsx");
+                alert("Xuất file báo cáo nâng cao Excel thành công!");
+            } catch (e) {
+                console.error(e);
+                alert("Đã xảy ra lỗi khi tạo file Excel: " + e.message);
+            }
+        }
+    </script>
 </body>
 </html>
+ 
