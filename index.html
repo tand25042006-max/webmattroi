@@ -978,7 +978,7 @@ function loadSolarData() {
             if (!data || data.length === 0) return;
 
             localDataLogs = data;
-            const latest = data[data.length - 1];
+            const latest = data[0];
             lastDataTimestamp = Date.now();
 
             const uVal    = +(latest.dien_ap   ?? 0);
