@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời</title>
+    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời - T-Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
         :root {
             --bg-deep:    #050b18;
             --bg-mid:     #0a1628;
-            --bg-panel:   rgba(10, 22, 45, 0.75);
-            --bg-card:    rgba(6, 14, 30, 0.8);
+            --bg-panel:   rgba(10, 22, 45, 0.55);
+            --bg-card:    rgba(8, 18, 38, 0.55);
             --border:     rgba(56, 189, 248, 0.12);
             --border-hot: rgba(56, 189, 248, 0.35);
 
@@ -35,7 +35,13 @@
             --font-mono:    'JetBrains Mono', monospace;
 
             --nav-h: 70px;
-            --radius: 16px;
+            --radius: 18px;
+
+            /* Glass */
+            --glass-blur: blur(18px) saturate(180%);
+            --glass-bg:   rgba(10, 22, 50, 0.45);
+            --glass-border: rgba(56, 189, 248, 0.18);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -69,15 +75,43 @@
             left: -20%;
             width: 70%;
             height: 70%;
-            background: radial-gradient(ellipse, rgba(56,189,248,0.04) 0%, transparent 65%);
+            background: radial-gradient(ellipse, rgba(56,189,248,0.05) 0%, transparent 65%);
             pointer-events: none;
             z-index: 0;
             animation: bgPulse 8s ease-in-out infinite alternate;
         }
 
+        /* Second ambient orb */
+        .orb2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(99,102,241,0.05) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgPulse2 10s ease-in-out infinite alternate;
+        }
+
         @keyframes bgPulse {
             from { opacity: 0.6; transform: scale(1); }
             to   { opacity: 1;   transform: scale(1.1); }
+        }
+        @keyframes bgPulse2 {
+            from { opacity: 0.4; transform: scale(1.05); }
+            to   { opacity: 0.9; transform: scale(0.95); }
+        }
+
+        /* ══════════════════════════════════════
+           GLASS MIXIN — applied via class
+        ══════════════════════════════════════ */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
         }
 
         /* ══════════════════════════════════════
@@ -94,14 +128,17 @@
         }
 
         .login-box {
-            background: rgba(10, 22, 45, 0.9);
+            background: rgba(10, 22, 45, 0.6);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
             border: 1px solid var(--border-hot);
-            border-radius: 24px;
+            border-radius: 28px;
             padding: 48px 40px;
             width: 100%;
             max-width: 400px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 60px rgba(56,189,248,0.08), 0 30px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 0 80px rgba(56,189,248,0.10),
+                        0 30px 60px rgba(0,0,0,0.5),
+                        inset 0 1px 0 rgba(255,255,255,0.08);
             position: relative;
             z-index: 1;
         }
@@ -114,11 +151,12 @@
         .login-logo .icon-ring {
             width: 72px; height: 72px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(99,102,241,0.15));
+            background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(99,102,241,0.18));
             border: 1.5px solid var(--border-hot);
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 16px;
-            box-shadow: 0 0 30px rgba(56,189,248,0.15);
+            box-shadow: 0 0 30px rgba(56,189,248,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .login-logo .icon-ring i { font-size: 28px; color: var(--cyan); }
@@ -130,8 +168,9 @@
         .input-wrap input {
             width: 100%;
             padding: 13px 16px;
-            background: rgba(5, 11, 24, 0.8);
-            border: 1px solid var(--border);
+            background: rgba(5, 11, 24, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(56,189,248,0.2);
             border-radius: 10px;
             color: var(--text-primary);
             font-family: var(--font-mono);
@@ -139,7 +178,7 @@
             outline: none;
             transition: 0.3s;
         }
-        .input-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(56,189,248,0.15); }
+        .input-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 20px rgba(56,189,248,0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
 
         #btn-login {
             width: 100%;
@@ -152,7 +191,7 @@
             cursor: pointer; transition: 0.3s;
             box-shadow: 0 4px 20px rgba(56,189,248,0.3);
         }
-        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56,189,248,0.45); }
+        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(56,189,248,0.5); }
         #login-error { color: var(--rose); font-size: 12px; font-family: var(--font-mono); margin-top: 12px; text-align: center; display: none; }
 
         /* ══════════════════════════════════════
@@ -163,9 +202,11 @@
         /* TOP HEADER */
         .app-header {
             position: sticky; top: 0; z-index: 50;
-            background: rgba(5, 11, 24, 0.92);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(5, 11, 24, 0.7);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(56,189,248,0.08);
             padding: 0 24px;
             height: 64px;
             display: flex; align-items: center; justify-content: space-between;
@@ -203,16 +244,26 @@
             padding: 8px 16px; border-radius: 8px; font-family: var(--font-display);
             font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;
             display: flex; align-items: center; gap: 6px; border: none;
+            backdrop-filter: blur(8px);
         }
-        .btn-excel { background: linear-gradient(135deg, var(--emerald), #059669); color: #fff; }
-        .btn-excel:hover { box-shadow: 0 4px 15px rgba(16,185,129,0.4); transform: translateY(-1px); }
-        .btn-logout { background: transparent; border: 1px solid rgba(244,63,94,0.4); color: var(--rose); }
-        .btn-logout:hover { background: rgba(244,63,94,0.1); }
+        .btn-excel {
+            background: rgba(16,185,129,0.2);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: var(--emerald);
+        }
+        .btn-excel:hover { background: rgba(16,185,129,0.3); box-shadow: 0 4px 15px rgba(16,185,129,0.25); transform: translateY(-1px); }
+        .btn-logout {
+            background: rgba(244,63,94,0.1);
+            border: 1px solid rgba(244,63,94,0.3);
+            color: var(--rose);
+        }
+        .btn-logout:hover { background: rgba(244,63,94,0.2); }
 
         /* DEVICE ALERT */
         #device-alert-bar {
-            background: linear-gradient(90deg, rgba(244,63,94,0.15), rgba(244,63,94,0.3));
-            border-bottom: 1px solid rgba(244,63,94,0.5);
+            background: linear-gradient(90deg, rgba(244,63,94,0.12), rgba(244,63,94,0.25));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(244,63,94,0.4);
             color: #fca5a5;
             padding: 10px;
             text-align: center;
@@ -240,8 +291,11 @@
         }
 
         .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(8, 18, 40, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius);
             padding: 20px 16px 16px;
             text-align: center;
@@ -250,12 +304,22 @@
             overflow: hidden;
         }
 
+        /* Glass shimmer top edge */
         .metric-card::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 2px;
             border-radius: var(--radius) var(--radius) 0 0;
+        }
+        /* Inner top highlight */
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            border-radius: var(--radius);
         }
 
         .metric-card.volt::before   { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
@@ -265,21 +329,21 @@
         .metric-card.lux::before    { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
         .metric-card.eff::before    { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
 
-        .metric-card:hover { transform: translateY(-4px); }
-        .metric-card:hover.volt   { border-color: rgba(56,189,248,0.4);   box-shadow: 0 8px 25px rgba(56,189,248,0.12); }
-        .metric-card:hover.curr   { border-color: rgba(129,140,248,0.4);  box-shadow: 0 8px 25px rgba(129,140,248,0.12); }
-        .metric-card:hover.power  { border-color: rgba(245,158,11,0.4);   box-shadow: 0 8px 25px rgba(245,158,11,0.12); }
-        .metric-card:hover.temp   { border-color: rgba(244,63,94,0.4);    box-shadow: 0 8px 25px rgba(244,63,94,0.12); }
-        .metric-card:hover.lux    { border-color: rgba(251,191,36,0.4);   box-shadow: 0 8px 25px rgba(251,191,36,0.12); }
-        .metric-card:hover.eff    { border-color: rgba(16,185,129,0.4);   box-shadow: 0 8px 25px rgba(16,185,129,0.12); }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-card:hover.volt   { border-color: rgba(56,189,248,0.45);   box-shadow: 0 16px 40px rgba(56,189,248,0.15), inset 0 1px 0 rgba(56,189,248,0.1); }
+        .metric-card:hover.curr   { border-color: rgba(129,140,248,0.45);  box-shadow: 0 16px 40px rgba(129,140,248,0.15), inset 0 1px 0 rgba(129,140,248,0.1); }
+        .metric-card:hover.power  { border-color: rgba(245,158,11,0.45);   box-shadow: 0 16px 40px rgba(245,158,11,0.15), inset 0 1px 0 rgba(245,158,11,0.1); }
+        .metric-card:hover.temp   { border-color: rgba(244,63,94,0.45);    box-shadow: 0 16px 40px rgba(244,63,94,0.15), inset 0 1px 0 rgba(244,63,94,0.1); }
+        .metric-card:hover.lux    { border-color: rgba(251,191,36,0.45);   box-shadow: 0 16px 40px rgba(251,191,36,0.15), inset 0 1px 0 rgba(251,191,36,0.1); }
+        .metric-card:hover.eff    { border-color: rgba(16,185,129,0.45);   box-shadow: 0 16px 40px rgba(16,185,129,0.15), inset 0 1px 0 rgba(16,185,129,0.1); }
 
         .metric-icon { font-size: 26px; margin-bottom: 10px; }
-        .metric-card.volt  .metric-icon { color: var(--cyan);    filter: drop-shadow(0 0 6px rgba(56,189,248,0.4)); }
-        .metric-card.curr  .metric-icon { color: var(--violet);  filter: drop-shadow(0 0 6px rgba(129,140,248,0.4)); }
-        .metric-card.power .metric-icon { color: var(--amber);   filter: drop-shadow(0 0 6px rgba(245,158,11,0.4)); }
-        .metric-card.temp  .metric-icon { color: var(--rose);    filter: drop-shadow(0 0 6px rgba(244,63,94,0.4)); }
-        .metric-card.lux   .metric-icon { color: var(--yellow);  filter: drop-shadow(0 0 6px rgba(251,191,36,0.4)); }
-        .metric-card.eff   .metric-icon { color: var(--emerald); filter: drop-shadow(0 0 6px rgba(16,185,129,0.4)); }
+        .metric-card.volt  .metric-icon { color: var(--cyan);    filter: drop-shadow(0 0 8px rgba(56,189,248,0.5)); }
+        .metric-card.curr  .metric-icon { color: var(--violet);  filter: drop-shadow(0 0 8px rgba(129,140,248,0.5)); }
+        .metric-card.power .metric-icon { color: var(--amber);   filter: drop-shadow(0 0 8px rgba(245,158,11,0.5)); }
+        .metric-card.temp  .metric-icon { color: var(--rose);    filter: drop-shadow(0 0 8px rgba(244,63,94,0.5)); }
+        .metric-card.lux   .metric-icon { color: var(--yellow);  filter: drop-shadow(0 0 8px rgba(251,191,36,0.5)); }
+        .metric-card.eff   .metric-icon { color: var(--emerald); filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)); }
 
         .metric-label {
             font-size: 10px; font-family: var(--font-mono);
@@ -305,12 +369,24 @@
         }
 
         .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(6, 14, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius);
             padding: 16px;
             height: 260px;
             display: flex; flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
         }
 
         .chart-card .chart-title {
@@ -324,12 +400,24 @@
 
         /* FOOTER STATUS BAR */
         .status-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(6, 14, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius);
             padding: 14px 20px;
             display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
             font-family: var(--font-mono); font-size: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .status-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
         }
 
         .status-items { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
@@ -337,12 +425,12 @@
         .status-dot-live {
             width: 7px; height: 7px; border-radius: 50%;
             background: var(--emerald);
-            box-shadow: 0 0 8px var(--emerald);
+            box-shadow: 0 0 10px var(--emerald);
             animation: liveDot 2s ease-in-out infinite;
         }
         @keyframes liveDot {
-            0%,100% { opacity: 1; box-shadow: 0 0 8px var(--emerald); }
-            50%      { opacity: 0.5; box-shadow: 0 0 3px var(--emerald); }
+            0%,100% { opacity: 1; box-shadow: 0 0 10px var(--emerald); }
+            50%      { opacity: 0.4; box-shadow: 0 0 4px var(--emerald); }
         }
         .status-dot-live.dead {
             background: var(--rose); box-shadow: 0 0 8px var(--rose);
@@ -365,31 +453,41 @@
         }
 
         .sensor-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(6, 14, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius);
             padding: 24px 20px;
             position: relative;
             overflow: hidden;
             transition: 0.3s;
         }
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
 
         .sensor-card.online  { border-color: rgba(16,185,129,0.3); }
         .sensor-card.offline { border-color: rgba(244,63,94,0.3); }
         .sensor-card.warning { border-color: rgba(245,158,11,0.3); }
 
-        .sensor-card::after {
-            content: '';
+        .sensor-glow {
             position: absolute;
             top: 0; right: 0;
-            width: 80px; height: 80px;
+            width: 100px; height: 100px;
             border-radius: 50%;
-            transform: translate(30px, -30px);
-            opacity: 0.08;
+            transform: translate(40px, -40px);
+            opacity: 0.07;
+            filter: blur(20px);
         }
-        .sensor-card.online::after  { background: var(--emerald); }
-        .sensor-card.offline::after { background: var(--rose); }
-        .sensor-card.warning::after { background: var(--amber); }
+        .sensor-card.online  .sensor-glow { background: var(--emerald); }
+        .sensor-card.offline .sensor-glow { background: var(--rose); }
+        .sensor-card.warning .sensor-glow { background: var(--amber); }
 
         .sensor-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         .sensor-name { font-size: 16px; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
@@ -399,16 +497,19 @@
             padding: 4px 10px; border-radius: 20px;
             font-size: 11px; font-weight: 700; font-family: var(--font-mono);
             letter-spacing: 0.5px;
+            backdrop-filter: blur(8px);
         }
-        .badge-online  { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
-        .badge-offline { background: rgba(244,63,94,0.15);  color: var(--rose);    border: 1px solid rgba(244,63,94,0.3); }
-        .badge-warning { background: rgba(245,158,11,0.15); color: var(--amber);   border: 1px solid rgba(245,158,11,0.3); }
+        .badge-online  { background: rgba(16,185,129,0.12); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
+        .badge-offline { background: rgba(244,63,94,0.12);  color: var(--rose);    border: 1px solid rgba(244,63,94,0.3); }
+        .badge-warning { background: rgba(245,158,11,0.12); color: var(--amber);   border: 1px solid rgba(245,158,11,0.3); }
 
         .sensor-metrics { display: flex; flex-direction: column; gap: 8px; }
         .sensor-metric-row {
             display: flex; justify-content: space-between; align-items: center;
             padding: 8px 12px;
-            background: rgba(5,11,24,0.5);
+            background: rgba(5,11,24,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.04);
             border-radius: 8px; font-family: var(--font-mono); font-size: 12px;
         }
         .sensor-metric-row .sm-key { color: var(--text-secondary); }
@@ -417,8 +518,8 @@
         .sensor-i2c {
             margin-top: 14px;
             padding: 8px 12px;
-            background: rgba(56,189,248,0.05);
-            border: 1px solid rgba(56,189,248,0.1);
+            background: rgba(56,189,248,0.04);
+            border: 1px solid rgba(56,189,248,0.12);
             border-radius: 8px;
             font-family: var(--font-mono); font-size: 11px;
             color: var(--cyan);
@@ -437,11 +538,13 @@
 
         .btn-clear-errors {
             padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s;
-            background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);
+            background: rgba(244,63,94,0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(244,63,94,0.3);
             color: var(--rose); font-family: var(--font-mono); font-size: 12px;
             display: flex; align-items: center; gap: 6px;
         }
-        .btn-clear-errors:hover { background: rgba(244,63,94,0.2); }
+        .btn-clear-errors:hover { background: rgba(244,63,94,0.18); }
 
         .error-stats {
             display: grid;
@@ -450,25 +553,42 @@
         }
 
         .err-stat-card {
-            background: var(--bg-card); border: 1px solid var(--border);
+            background: rgba(6, 14, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius); padding: 16px; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .err-stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
         }
         .err-stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
         .err-stat-lbl { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px; }
 
         .error-log-container {
-            background: var(--bg-card); border: 1px solid var(--border);
+            background: rgba(6, 14, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
             border-radius: var(--radius); overflow: hidden;
         }
 
         .error-log-header {
             padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             display: grid;
             grid-template-columns: 160px 120px 1fr 120px;
             gap: 12px;
             font-family: var(--font-mono); font-size: 11px;
             color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
+            background: rgba(56,189,248,0.03);
         }
 
         #error-log-body { max-height: 380px; overflow-y: auto; }
@@ -486,22 +606,22 @@
             transition: 0.2s;
             align-items: center;
         }
-        .error-row:hover { background: rgba(56,189,248,0.03); }
+        .error-row:hover { background: rgba(56,189,248,0.04); }
         .error-row:last-child { border-bottom: none; }
 
         .err-time { color: var(--text-secondary); }
         .err-device { color: var(--cyan); font-weight: 600; }
         .err-msg { color: var(--text-primary); }
-        .err-level { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-align: center; }
-        .level-critical { background: rgba(244,63,94,0.15); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
-        .level-warning  { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-        .level-info     { background: rgba(56,189,248,0.1);  color: var(--cyan);  border: 1px solid rgba(56,189,248,0.2); }
+        .err-level { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-align: center; backdrop-filter: blur(8px); }
+        .level-critical { background: rgba(244,63,94,0.12); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
+        .level-warning  { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+        .level-info     { background: rgba(56,189,248,0.08);  color: var(--cyan);  border: 1px solid rgba(56,189,248,0.2); }
 
         .no-errors {
             padding: 60px 20px; text-align: center;
             font-family: var(--font-mono); color: var(--text-secondary);
         }
-        .no-errors i { font-size: 40px; color: var(--emerald); margin-bottom: 14px; display: block; filter: drop-shadow(0 0 10px rgba(16,185,129,0.4)); }
+        .no-errors i { font-size: 40px; color: var(--emerald); margin-bottom: 14px; display: block; filter: drop-shadow(0 0 12px rgba(16,185,129,0.5)); }
 
         /* ══════════════════════════════════════
            BOTTOM NAVIGATION
@@ -510,9 +630,11 @@
             position: fixed;
             bottom: 0; left: 0; right: 0;
             height: var(--nav-h);
-            background: rgba(5, 11, 24, 0.96);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
+            background: rgba(5, 11, 24, 0.75);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border-top: 1px solid var(--glass-border);
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
             display: flex; align-items: center; justify-content: space-around;
             z-index: 50;
             padding: 0 8px;
@@ -528,7 +650,10 @@
         .nav-tab i { font-size: 18px; color: var(--text-dim); transition: 0.25s; }
         .nav-tab span { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); transition: 0.25s; letter-spacing: 0.5px; }
 
-        .nav-tab.active { background: rgba(56,189,248,0.08); }
+        .nav-tab.active {
+            background: rgba(56,189,248,0.08);
+            backdrop-filter: blur(8px);
+        }
         .nav-tab.active i   { color: var(--cyan); filter: drop-shadow(0 0 8px rgba(56,189,248,0.5)); }
         .nav-tab.active span { color: var(--cyan); }
 
@@ -538,13 +663,12 @@
             top: 0; left: 20%; right: 20%;
             height: 2px; border-radius: 0 0 4px 4px;
             background: var(--cyan);
-            box-shadow: 0 0 10px var(--cyan);
+            box-shadow: 0 0 12px var(--cyan);
         }
 
         .nav-tab:hover:not(.active) { background: rgba(56,189,248,0.04); }
         .nav-tab:hover:not(.active) i { color: var(--text-secondary); }
 
-        /* Badge for error count */
         .nav-badge {
             position: absolute; top: 6px; right: calc(50% - 18px);
             background: var(--rose); color: #fff;
@@ -554,12 +678,10 @@
             border: 1.5px solid var(--bg-deep);
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-hot); border-radius: 4px; }
 
-        /* Responsive tweaks */
         @media (max-width: 600px) {
             .header-left h1 { display: none; }
             .realtime-clock { font-size: 16px; }
@@ -570,6 +692,7 @@
     </style>
 </head>
 <body>
+<div class="orb2"></div>
 
 <!-- ══════════ LOGIN ══════════ -->
 <div id="login-screen">
@@ -714,9 +837,7 @@
                     <p>// Kết nối I²C & 1-Wire · Cập nhật tự động mỗi 3s</p>
                 </div>
             </div>
-            <div class="sensor-grid" id="sensor-grid">
-                <!-- JS rendered -->
-            </div>
+            <div class="sensor-grid" id="sensor-grid"></div>
         </div>
 
         <!-- PAGE 3: ERROR HISTORY -->
@@ -768,7 +889,6 @@
 
     </div><!-- /page-content -->
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <button class="nav-tab active" id="nav-dashboard" onclick="switchPage('dashboard')">
             <i class="fa-solid fa-gauge-high"></i>
@@ -792,7 +912,7 @@
 // CONSTANTS & STATE
 // ═══════════════════════════════════════════════
 const API_URL = "https://esp32-backend-vqfp.onrender.com/api/data";
-const MAX_CHART_POINTS = 120; // ~2 hours at 1 point/minute (or fill proportionally)
+const MAX_CHART_POINTS = 120;
 
 let localDataLogs = [];
 let lastDataTimestamp = null;
@@ -803,49 +923,68 @@ let lastRenderedId = null;
 let fetchInterval = null;
 let connInterval = null;
 
-// Sensor definitions
 const SENSORS = [
     {
-        id: 'INA226',
-        name: 'INA226',
-        type: 'Cảm biến dòng/áp — I²C',
-        address: '0x40',
+        id: 'INA226', name: 'INA226', type: 'Cảm biến dòng/áp — I²C', address: '0x40',
         fields: ['Điện áp (U)', 'Dòng điện (I)', 'Công suất (P)'],
         fieldIds: ['dien_ap', 'dong_dien', 'cong_suat'],
-        fieldSuffix: ['V', 'A', 'W'],
-        color: 'var(--cyan)'
+        fieldSuffix: ['V', 'A', 'W'], color: 'var(--cyan)'
     },
     {
-        id: 'VEML7700',
-        name: 'VEML7700',
-        type: 'Cảm biến ánh sáng — I²C',
-        address: '0x10',
-        fields: ['Cường độ sáng'],
-        fieldIds: ['anh_sang'],
-        fieldSuffix: ['Lux'],
-        color: 'var(--yellow)'
+        id: 'VEML7700', name: 'VEML7700', type: 'Cảm biến ánh sáng — I²C', address: '0x10',
+        fields: ['Cường độ sáng'], fieldIds: ['anh_sang'], fieldSuffix: ['Lux'], color: 'var(--yellow)'
     },
     {
-        id: 'MPU6050',
-        name: 'MPU6050',
-        type: 'Cảm biến gia tốc/góc — I²C',
-        address: '0x68',
-        fields: ['Góc nghiêng X', 'Góc xoay Y'],
-        fieldIds: ['goc_x', 'goc_y'],
-        fieldSuffix: ['°', '°'],
-        color: 'var(--violet)'
+        id: 'MPU6050', name: 'MPU6050', type: 'Cảm biến gia tốc/góc — I²C', address: '0x68',
+        fields: ['Góc nghiêng X', 'Góc xoay Y'], fieldIds: ['goc_x', 'goc_y'],
+        fieldSuffix: ['°', '°'], color: 'var(--violet)'
     },
     {
-        id: 'DS18B20',
-        name: 'DS18B20',
-        type: 'Cảm biến nhiệt độ — 1-Wire',
-        address: 'GPIO 4',
-        fields: ['Nhiệt độ pin'],
-        fieldIds: ['nhiet_do'],
-        fieldSuffix: ['°C'],
-        color: 'var(--rose)'
+        id: 'DS18B20', name: 'DS18B20', type: 'Cảm biến nhiệt độ — 1-Wire', address: 'GPIO 4',
+        fields: ['Nhiệt độ pin'], fieldIds: ['nhiet_do'], fieldSuffix: ['°C'], color: 'var(--rose)'
     }
 ];
+
+// ═══════════════════════════════════════════════
+// HELPERS — parse ISO timestamp → local time
+// ═══════════════════════════════════════════════
+/**
+ * Parse created_at (ISO 8601, stored as UTC in Supabase) → local Date object
+ * Handles both "2024-01-15T08:30:00" (no Z) and "2024-01-15T08:30:00Z"
+ * Supabase returns without Z suffix but value is UTC — append Z to parse correctly.
+ */
+function parseTimestamp(raw) {
+    if (!raw) return new Date();
+    // If already has timezone info, parse directly
+    if (raw.endsWith('Z') || raw.includes('+')) {
+        return new Date(raw);
+    }
+    // Supabase: no Z suffix but value is UTC
+    return new Date(raw + 'Z');
+}
+
+/**
+ * Format Date → "HH:MM:SS" in local time (for chart label)
+ */
+function formatTimeLabel(date) {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
+}
+
+/**
+ * Format Date → "HH:MM:SS DD/MM/YYYY" in local time (for Excel & error log)
+ */
+function formatDateTimeFull(date) {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mo = String(date.getMonth() + 1).padStart(2, '0');
+    const yy = date.getFullYear();
+    return `${hh}:${mm}:${ss} ${dd}/${mo}/${yy}`;
+}
 
 // ═══════════════════════════════════════════════
 // CLOCK
@@ -875,11 +1014,7 @@ function switchPage(page) {
     });
     document.getElementById('page-'+page).classList.add('active');
     document.getElementById('nav-'+page).classList.add('active');
-
-    if (page === 'errors') {
-        errorBadgeCount = 0;
-        updateErrorBadge();
-    }
+    if (page === 'errors') { errorBadgeCount = 0; updateErrorBadge(); }
     if (page === 'sensors') renderSensorGrid();
 }
 
@@ -918,14 +1053,19 @@ function handleLogout() {
 // CHARTS INIT
 // ═══════════════════════════════════════════════
 function initCharts() {
-    const opts = (color) => ({
+    const opts = () => ({
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 300 },
         plugins: { legend: { display: false } },
         scales: {
             x: {
-                ticks: { color: '#475569', font: { size: 9, family: 'JetBrains Mono' }, maxTicksLimit: 8 },
+                ticks: {
+                    color: '#475569',
+                    font: { size: 9, family: 'JetBrains Mono' },
+                    maxTicksLimit: 8,
+                    maxRotation: 0
+                },
                 grid: { display: false },
                 border: { color: 'rgba(255,255,255,0.05)' }
             },
@@ -940,19 +1080,17 @@ function initCharts() {
     chartU = new Chart(document.getElementById('chart-voltage').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#38bdf8')
+        options: opts()
     });
-
     chartI = new Chart(document.getElementById('chart-current').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#818cf8', backgroundColor: 'rgba(129,140,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#818cf8')
+        options: opts()
     });
-
     chartP = new Chart(document.getElementById('chart-power').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
-        options: opts('#f59e0b')
+        options: opts()
     });
 }
 
@@ -987,9 +1125,9 @@ function loadSolarData() {
             const tempVal = +(latest.nhiet_do  ?? 0);
             const luxVal  = +(latest.anh_sang  ?? 0);
 
-            document.getElementById('dien-ap').textContent       = uVal.toFixed(1)  + ' V';
-            document.getElementById('dong-dien').textContent     = iVal.toFixed(2)  + ' A';
-            document.getElementById('cong-suat').textContent     = pVal.toFixed(1)  + ' W';
+            document.getElementById('dien-ap').textContent       = uVal.toFixed(1)    + ' V';
+            document.getElementById('dong-dien').textContent     = iVal.toFixed(2)    + ' A';
+            document.getElementById('cong-suat').textContent     = pVal.toFixed(1)    + ' W';
             document.getElementById('nhiet-do').textContent      = tempVal.toFixed(1) + ' °C';
             document.getElementById('cuong-do-sang').textContent = luxVal + ' Lux';
 
@@ -1012,13 +1150,15 @@ function loadSolarData() {
 
             checkThresholds(uVal, iVal, pVal, tempVal);
 
-            // Chỉ push vào chart khi có record MỚI
+            // Push to chart only when new record
             const currentId = latest.id ?? latest.created_at;
             if (currentId !== lastRenderedId) {
                 lastRenderedId = currentId;
-                const timeLabel = latest.created_at
-                    ? latest.created_at.split('T')[1].substring(0, 8)
-                    : new Date().toLocaleTimeString('vi-VN');
+
+                // ✅ FIX: Parse created_at as UTC → convert to local time for label
+                const localDate = parseTimestamp(latest.created_at);
+                const timeLabel = formatTimeLabel(localDate);
+
                 updateChartsRealtime(timeLabel, uVal, iVal, pVal);
             }
         })
@@ -1075,11 +1215,10 @@ function checkThresholds(u, i, p, t) {
 // ═══════════════════════════════════════════════
 function addErrorLog(level, device, msg) {
     const now = new Date();
-    const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}`;
+    const ts = formatDateTimeFull(now);
     errorLogs.unshift({ time: ts, device, msg, level });
     if (errorLogs.length > 200) errorLogs.pop();
 
-    // Badge (only when not on error page)
     const activePage = document.querySelector('.page.active');
     if (!activePage || activePage.id !== 'page-errors') {
         errorBadgeCount++;
@@ -1138,15 +1277,15 @@ function clearErrors() {
 // SENSOR STATUS PAGE
 // ═══════════════════════════════════════════════
 function renderSensorGrid() {
-    const latest = localDataLogs.length > 0 ? localDataLogs[localDataLogs.length - 1] : null;
+    const latest = localDataLogs.length > 0 ? localDataLogs[0] : null;
     const isConnected = lastDataTimestamp !== null && (Date.now() - lastDataTimestamp) < 7000;
 
     const grid = document.getElementById('sensor-grid');
     grid.innerHTML = SENSORS.map(s => {
         const hasData = latest !== null;
         const status  = !isConnected ? 'offline' : (hasData ? 'online' : 'warning');
-        const badgeText = { online: 'ONLINE', offline: 'OFFLINE', warning: 'CHỜ DỮ LIỆU' }[status];
-        const badgeClass= { online: 'badge-online', offline: 'badge-offline', warning: 'badge-warning' }[status];
+        const badgeText  = { online: 'ONLINE', offline: 'OFFLINE', warning: 'CHỜ DỮ LIỆU' }[status];
+        const badgeClass = { online: 'badge-online', offline: 'badge-offline', warning: 'badge-warning' }[status];
 
         const rows = s.fields.map((f, idx) => {
             const rawVal = latest ? (latest[s.fieldIds[idx]] ?? '--') : '--';
@@ -1160,6 +1299,7 @@ function renderSensorGrid() {
 
         return `
         <div class="sensor-card ${status}">
+            <div class="sensor-glow"></div>
             <div class="sensor-top">
                 <div>
                     <div class="sensor-name" style="color:${s.color}">${s.name}</div>
@@ -1177,37 +1317,50 @@ function renderSensorGrid() {
 }
 
 // ═══════════════════════════════════════════════
-// EXCEL EXPORT
+// EXCEL EXPORT — ✅ FIX: thời gian local time
 // ═══════════════════════════════════════════════
 function exportToExcel() {
     if (!localDataLogs.length) { alert('Không có dữ liệu để xuất!'); return; }
     try {
         const rows = localDataLogs.map((item, i) => {
-            const P = item.cong_suat || 0;
+            const P       = item.cong_suat || 0;
             const P_Light = (item.anh_sang || 0) * 0.0079;
-            const hs = P_Light > 0 ? (P / P_Light * 100).toFixed(1) : 0;
-            const hsDK = Math.min(95.5, parseFloat(hs) * 1.15 + 2.5).toFixed(1);
+            const hs      = P_Light > 0 ? (P / P_Light * 100).toFixed(1) : 0;
+            const hsDK    = Math.min(95.5, parseFloat(hs) * 1.15 + 2.5).toFixed(1);
+
+            // ✅ Parse ISO UTC → local time string for Excel
+            const localDate = parseTimestamp(item.created_at);
+            const thoiGian  = formatDateTimeFull(localDate);
+
             return {
-                'STT': i + 1,
-                'Điện Áp U (V)': item.dien_ap,
-                'Dòng Điện I (A)': item.dong_dien,
-                'Công Suất P (W)': P,
-                'Định Mức (W)': 50,
-                'Ánh Sáng (Lux)': item.anh_sang,
-                'P_Light LT (W)': P_Light.toFixed(2),
+                'STT':                i + 1,
+                'Điện Áp U (V)':      item.dien_ap,
+                'Dòng Điện I (A)':    item.dong_dien,
+                'Công Suất P (W)':    P,
+                'Định Mức (W)':       50,
+                'Ánh Sáng (Lux)':     item.anh_sang,
+                'P_Light LT (W)':     P_Light.toFixed(2),
                 'Hiệu Suất Thực (%)': hs,
-                'Hiệu Suất DK (%)': hsDK,
-                'Nhiệt Độ (°C)': item.nhiet_do,
-                'Góc X': item.goc_x,
-                'Góc Y': item.goc_y,
-                'Góc Z': Math.abs((item.goc_x||0) - (item.goc_y||0)),
-                'Thời Gian': item.created_at
+                'Hiệu Suất DK (%)':   hsDK,
+                'Nhiệt Độ (°C)':      item.nhiet_do,
+                'Góc X':              item.goc_x,
+                'Góc Y':              item.goc_y,
+                'Góc Z':              Math.abs((item.goc_x||0) - (item.goc_y||0)),
+                'Thời Gian (Local)':  thoiGian
             };
         });
         const ws = XLSX.utils.json_to_sheet(rows);
+
+        // Auto column width
+        const colWidths = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, 14) }));
+        ws['!cols'] = colWidths;
+
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Solar_Data');
-        XLSX.writeFile(wb, 'BaoCao_Solar_T_Digital.xlsx');
+
+        const now = new Date();
+        const fname = `BaoCao_Solar_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${now.getFullYear()}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.xlsx`;
+        XLSX.writeFile(wb, fname);
     } catch(e) { alert('Lỗi xuất Excel: ' + e.message); }
 }
 
