@@ -12,36 +12,45 @@
 
     <style>
         :root {
-            --bg-deep:    #050b18;
-            --bg-mid:     #0a1628;
-            --bg-panel:   rgba(10, 22, 45, 0.55);
-            --bg-card:    rgba(8, 18, 38, 0.55);
-            --border:     rgba(56, 189, 248, 0.12);
-            --border-hot: rgba(56, 189, 248, 0.35);
+            --bg-deep:    #04081a;
+            --bg-mid:     #080f22;
 
+            /* Liquid glass palette — vivid spectrum */
+            --lg-blue:    rgba(56, 189, 248, 1);
+            --lg-violet:  rgba(139, 92, 246, 1);
+            --lg-pink:    rgba(236, 72, 153, 1);
+            --lg-amber:   rgba(251, 146, 60, 1);
+            --lg-emerald: rgba(16, 185, 129, 1);
+            --lg-rose:    rgba(244, 63, 94, 1);
+            --lg-yellow:  rgba(250, 204, 21, 1);
+            --lg-indigo:  rgba(99, 102, 241, 1);
+            --lg-teal:    rgba(20, 184, 166, 1);
+            --lg-lime:    rgba(132, 204, 22, 1);
+
+            /* Semantic aliases */
             --cyan:   #38bdf8;
-            --violet: #818cf8;
-            --amber:  #f59e0b;
+            --violet: #8b5cf6;
+            --amber:  #fb923c;
             --emerald:#10b981;
             --rose:   #f43f5e;
-            --yellow: #fbbf24;
+            --yellow: #facc15;
             --indigo: #6366f1;
+            --pink:   #ec4899;
+            --teal:   #14b8a6;
 
-            --text-primary:   #e2e8f0;
-            --text-secondary: #64748b;
-            --text-dim:       #334155;
+            --text-primary:   #f0f6ff;
+            --text-secondary: #7a90b0;
+            --text-dim:       #2a3a55;
 
             --font-display: 'Exo 2', sans-serif;
             --font-mono:    'JetBrains Mono', monospace;
 
             --nav-h: 70px;
-            --radius: 18px;
+            --radius: 20px;
 
-            /* Glass */
-            --glass-blur: blur(18px) saturate(180%);
-            --glass-bg:   rgba(10, 22, 50, 0.45);
-            --glass-border: rgba(56, 189, 248, 0.18);
-            --glass-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+            /* Liquid glass layers */
+            --lg-blur: blur(28px) saturate(220%);
+            --lg-shadow: 0 8px 40px rgba(0,0,0,0.55), inset 0 1.5px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(255,255,255,0.04);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -55,339 +64,358 @@
             position: relative;
         }
 
-        /* Animated background grid */
+        /* Deep space background */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background-image:
-                linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 10%, rgba(56,189,248,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 60% at 50% 50%, rgba(236,72,153,0.04) 0%, transparent 65%),
+                linear-gradient(180deg, #04081a 0%, #060c1e 50%, #04081a 100%);
             pointer-events: none;
             z-index: 0;
         }
 
+        /* Subtle grid */
         body::after {
             content: '';
             position: fixed;
-            top: -30%;
-            left: -20%;
-            width: 70%;
-            height: 70%;
-            background: radial-gradient(ellipse, rgba(56,189,248,0.05) 0%, transparent 65%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bgPulse 8s ease-in-out infinite alternate;
-        }
-
-        /* Second ambient orb */
-        .orb2 {
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 50%;
-            height: 50%;
-            background: radial-gradient(ellipse, rgba(99,102,241,0.05) 0%, transparent 65%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bgPulse2 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes bgPulse {
-            from { opacity: 0.6; transform: scale(1); }
-            to   { opacity: 1;   transform: scale(1.1); }
-        }
-        @keyframes bgPulse2 {
-            from { opacity: 0.4; transform: scale(1.05); }
-            to   { opacity: 0.9; transform: scale(0.95); }
-        }
-
-        /* ══════════════════════════════════════
-           GLASS MIXIN — applied via class
-        ══════════════════════════════════════ */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* ══════════════════════════════════════
-           LOGIN SCREEN
-        ══════════════════════════════════════ */
-        #login-screen {
-            position: fixed;
             inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            background: var(--bg-deep);
+            background-image:
+                linear-gradient(rgba(56,189,248,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient orbs */
+        .orb1 {
+            position: fixed; top: -15%; left: -10%; width: 55%; height: 55%;
+            background: radial-gradient(ellipse, rgba(56,189,248,0.08) 0%, transparent 65%);
+            pointer-events: none; z-index: 0;
+            animation: orbFloat1 12s ease-in-out infinite alternate;
+        }
+        .orb2 {
+            position: fixed; bottom: -20%; right: -10%; width: 50%; height: 50%;
+            background: radial-gradient(ellipse, rgba(139,92,246,0.08) 0%, transparent 65%);
+            pointer-events: none; z-index: 0;
+            animation: orbFloat2 15s ease-in-out infinite alternate;
+        }
+        .orb3 {
+            position: fixed; top: 40%; left: 60%; width: 35%; height: 35%;
+            background: radial-gradient(ellipse, rgba(236,72,153,0.05) 0%, transparent 65%);
+            pointer-events: none; z-index: 0;
+            animation: orbFloat3 10s ease-in-out infinite alternate;
+        }
+        @keyframes orbFloat1 { from { transform: scale(1) translate(0,0); } to { transform: scale(1.15) translate(2%,3%); } }
+        @keyframes orbFloat2 { from { transform: scale(1.05) translate(0,0); } to { transform: scale(0.9) translate(-2%,-2%); } }
+        @keyframes orbFloat3 { from { opacity: 0.6; transform: scale(1); } to { opacity: 1; transform: scale(1.2); } }
+
+        /* ══════════════════════════
+           LIQUID GLASS COMPONENT
+        ══════════════════════════ */
+        .lg-panel {
+            background: linear-gradient(135deg,
+                rgba(255,255,255,0.07) 0%,
+                rgba(255,255,255,0.03) 40%,
+                rgba(255,255,255,0.05) 100%);
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: var(--lg-shadow);
+        }
+
+        /* ══════════════════════════
+           LOGIN
+        ══════════════════════════ */
+        #login-screen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; background: var(--bg-deep);
         }
 
         .login-box {
-            background: rgba(10, 22, 45, 0.6);
-            backdrop-filter: blur(32px) saturate(200%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%);
-            border: 1px solid var(--border-hot);
-            border-radius: 28px;
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 0 80px rgba(56,189,248,0.10),
-                        0 30px 60px rgba(0,0,0,0.5),
-                        inset 0 1px 0 rgba(255,255,255,0.08);
-            position: relative;
-            z-index: 1;
+            background: linear-gradient(145deg,
+                rgba(56,189,248,0.1) 0%,
+                rgba(139,92,246,0.08) 50%,
+                rgba(236,72,153,0.06) 100%);
+            backdrop-filter: blur(40px) saturate(220%);
+            -webkit-backdrop-filter: blur(40px) saturate(220%);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 32px;
+            padding: 52px 44px;
+            width: 100%; max-width: 420px;
+            box-shadow:
+                0 0 80px rgba(56,189,248,0.12),
+                0 40px 80px rgba(0,0,0,0.5),
+                inset 0 1.5px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(255,255,255,0.05);
+            position: relative; z-index: 1;
         }
 
-        .login-logo {
-            text-align: center;
-            margin-bottom: 36px;
-        }
-
+        .login-logo { text-align: center; margin-bottom: 38px; }
         .login-logo .icon-ring {
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(99,102,241,0.18));
-            border: 1.5px solid var(--border-hot);
+            width: 76px; height: 76px; border-radius: 50%;
+            background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(139,92,246,0.25));
+            border: 1.5px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px;
-            box-shadow: 0 0 30px rgba(56,189,248,0.2),
-                        inset 0 1px 0 rgba(255,255,255,0.1);
+            margin: 0 auto 18px;
+            box-shadow: 0 0 40px rgba(56,189,248,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
         }
-
-        .login-logo .icon-ring i { font-size: 28px; color: var(--cyan); }
-        .login-logo h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: 1px; }
-        .login-logo p { font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px; }
+        .login-logo .icon-ring i { font-size: 30px; color: var(--cyan); filter: drop-shadow(0 0 10px var(--cyan)); }
+        .login-logo h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+        .login-logo p  { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 5px; }
 
         .input-wrap { margin-bottom: 20px; }
-        .input-wrap label { display: block; font-size: 11px; font-family: var(--font-mono); color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .input-wrap label { display: block; font-size: 11px; font-family: var(--font-mono); color: var(--cyan); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 9px; }
         .input-wrap input {
-            width: 100%;
-            padding: 13px 16px;
-            background: rgba(5, 11, 24, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(56,189,248,0.2);
-            border-radius: 10px;
+            width: 100%; padding: 14px 18px;
+            background: rgba(4,8,26,0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
             color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 14px;
-            outline: none;
-            transition: 0.3s;
+            font-family: var(--font-mono); font-size: 14px;
+            outline: none; transition: 0.3s;
         }
-        .input-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 20px rgba(56,189,248,0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
+        .input-wrap input:focus {
+            border-color: rgba(56,189,248,0.5);
+            box-shadow: 0 0 24px rgba(56,189,248,0.15), inset 0 1px 0 rgba(56,189,248,0.1);
+        }
 
         #btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--indigo) 100%);
-            border: none; border-radius: 10px;
-            color: #050b18; font-family: var(--font-display);
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, rgba(56,189,248,0.9) 0%, rgba(139,92,246,0.9) 100%);
+            border: none; border-radius: 12px;
+            color: #fff; font-family: var(--font-display);
             font-size: 14px; font-weight: 700;
             letter-spacing: 2px; text-transform: uppercase;
             cursor: pointer; transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+            box-shadow: 0 4px 24px rgba(56,189,248,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
-        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(56,189,248,0.5); }
-        #login-error { color: var(--rose); font-size: 12px; font-family: var(--font-mono); margin-top: 12px; text-align: center; display: none; }
+        #btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(56,189,248,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+        #login-error { color: var(--rose); font-size: 12px; font-family: var(--font-mono); margin-top: 14px; text-align: center; display: none; }
 
-        /* ══════════════════════════════════════
+        /* ══════════════════════════
            APP SHELL
-        ══════════════════════════════════════ */
+        ══════════════════════════ */
         #app { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
 
-        /* TOP HEADER */
+        /* HEADER */
         .app-header {
             position: sticky; top: 0; z-index: 50;
-            background: rgba(5, 11, 24, 0.7);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(56,189,248,0.08);
-            padding: 0 24px;
-            height: 64px;
+            background: linear-gradient(90deg,
+                rgba(56,189,248,0.06) 0%,
+                rgba(4,8,26,0.75) 30%,
+                rgba(4,8,26,0.75) 70%,
+                rgba(139,92,246,0.06) 100%);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 -1px 0 rgba(56,189,248,0.06), inset 0 1px 0 rgba(255,255,255,0.07);
+            padding: 0 24px; height: 64px;
             display: flex; align-items: center; justify-content: space-between;
         }
 
         .header-left { display: flex; align-items: center; gap: 14px; }
-        .header-left .logo-icon { color: var(--amber); font-size: 22px; filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
+        .header-left .logo-icon { color: var(--amber); font-size: 22px; filter: drop-shadow(0 0 10px rgba(251,146,60,0.7)); }
         .header-left h1 {
-            font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #fff 0%, #94a3b8 100%);
+            font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+            background: linear-gradient(90deg, #fff 0%, rgba(56,189,248,0.8) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .header-center {
-            display: flex; flex-direction: column; align-items: center;
-        }
+        .header-center { display: flex; flex-direction: column; align-items: center; }
         .realtime-clock {
-            font-family: var(--font-mono);
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--cyan);
+            font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+            background: linear-gradient(90deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(56,189,248,0.5);
+            filter: drop-shadow(0 0 12px rgba(56,189,248,0.4));
         }
         .realtime-date {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-secondary);
-            letter-spacing: 1px;
-            margin-top: 1px;
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-secondary); letter-spacing: 1px; margin-top: 1px;
         }
 
         .header-right { display: flex; gap: 10px; align-items: center; }
         .btn-sm {
-            padding: 8px 16px; border-radius: 8px; font-family: var(--font-display);
+            padding: 8px 16px; border-radius: 10px; font-family: var(--font-display);
             font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;
             display: flex; align-items: center; gap: 6px; border: none;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
         .btn-excel {
-            background: rgba(16,185,129,0.2);
-            border: 1px solid rgba(16,185,129,0.4);
-            color: var(--emerald);
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(20,184,166,0.1));
+            border: 1px solid rgba(16,185,129,0.3); color: var(--emerald);
         }
-        .btn-excel:hover { background: rgba(16,185,129,0.3); box-shadow: 0 4px 15px rgba(16,185,129,0.25); transform: translateY(-1px); }
+        .btn-excel:hover { background: linear-gradient(135deg, rgba(16,185,129,0.28), rgba(20,184,166,0.2)); box-shadow: 0 4px 18px rgba(16,185,129,0.25); transform: translateY(-1px); }
         .btn-logout {
-            background: rgba(244,63,94,0.1);
-            border: 1px solid rgba(244,63,94,0.3);
-            color: var(--rose);
+            background: linear-gradient(135deg, rgba(244,63,94,0.1), rgba(236,72,153,0.07));
+            border: 1px solid rgba(244,63,94,0.25); color: var(--rose);
         }
-        .btn-logout:hover { background: rgba(244,63,94,0.2); }
+        .btn-logout:hover { background: linear-gradient(135deg, rgba(244,63,94,0.22), rgba(236,72,153,0.15)); }
 
-        /* DEVICE ALERT */
+        /* ALERT BAR */
         #device-alert-bar {
-            background: linear-gradient(90deg, rgba(244,63,94,0.12), rgba(244,63,94,0.25));
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(244,63,94,0.4);
-            color: #fca5a5;
-            padding: 10px;
-            text-align: center;
+            background: linear-gradient(90deg, rgba(244,63,94,0.08), rgba(244,63,94,0.2), rgba(244,63,94,0.08));
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(244,63,94,0.35);
+            color: #fca5a5; padding: 10px; text-align: center;
             font-size: 13px; font-weight: 600; font-family: var(--font-mono);
-            display: none;
-            animation: alertPulse 1.5s infinite;
+            display: none; animation: alertPulse 1.5s infinite;
         }
-        @keyframes alertPulse {
-            0%,100% { opacity: 0.8; } 50% { opacity: 1; }
-        }
+        @keyframes alertPulse { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
 
-        /* PAGE CONTENT */
+        /* PAGE */
         .page-content { flex: 1; overflow-y: auto; padding-bottom: calc(var(--nav-h) + 16px); }
         .page { display: none; padding: 20px 20px 10px; }
         .page.active { display: block; }
 
-        /* ══════════════════════════════════════
-           PAGE 1 — DASHBOARD
-        ══════════════════════════════════════ */
+        /* ══════════════════════════
+           METRIC CARDS — liquid glass with color tints
+        ══════════════════════════ */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 14px; margin-bottom: 20px;
         }
 
         .metric-card {
-            background: rgba(8, 18, 40, 0.5);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
             border-radius: var(--radius);
-            padding: 20px 16px 16px;
+            padding: 22px 18px 18px;
             text-align: center;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            position: relative; overflow: hidden;
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
         }
 
-        /* Glass shimmer top edge */
+        /* Top edge glow line */
         .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            border-radius: var(--radius) var(--radius) 0 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; border-radius: var(--radius) var(--radius) 0 0;
         }
-        /* Inner top highlight */
+        /* Inner highlight */
         .metric-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 5%; right: 5%;
+            content: ''; position: absolute; top: 1px; left: 8%; right: 8%;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-            border-radius: var(--radius);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
         }
 
-        .metric-card.volt::before   { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
-        .metric-card.curr::before   { background: linear-gradient(90deg, transparent, var(--violet), transparent); }
-        .metric-card.power::before  { background: linear-gradient(90deg, transparent, var(--amber), transparent); }
-        .metric-card.temp::before   { background: linear-gradient(90deg, transparent, var(--rose), transparent); }
-        .metric-card.lux::before    { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
-        .metric-card.eff::before    { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
+        .metric-card.volt {
+            background: linear-gradient(145deg, rgba(56,189,248,0.12) 0%, rgba(56,189,248,0.04) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(56,189,248,0.2);
+            box-shadow: 0 8px 32px rgba(56,189,248,0.1), var(--lg-shadow);
+        }
+        .metric-card.volt::before { background: linear-gradient(90deg, transparent, rgba(56,189,248,0.9), transparent); }
 
-        .metric-card:hover { transform: translateY(-5px); }
-        .metric-card:hover.volt   { border-color: rgba(56,189,248,0.45);   box-shadow: 0 16px 40px rgba(56,189,248,0.15), inset 0 1px 0 rgba(56,189,248,0.1); }
-        .metric-card:hover.curr   { border-color: rgba(129,140,248,0.45);  box-shadow: 0 16px 40px rgba(129,140,248,0.15), inset 0 1px 0 rgba(129,140,248,0.1); }
-        .metric-card:hover.power  { border-color: rgba(245,158,11,0.45);   box-shadow: 0 16px 40px rgba(245,158,11,0.15), inset 0 1px 0 rgba(245,158,11,0.1); }
-        .metric-card:hover.temp   { border-color: rgba(244,63,94,0.45);    box-shadow: 0 16px 40px rgba(244,63,94,0.15), inset 0 1px 0 rgba(244,63,94,0.1); }
-        .metric-card:hover.lux    { border-color: rgba(251,191,36,0.45);   box-shadow: 0 16px 40px rgba(251,191,36,0.15), inset 0 1px 0 rgba(251,191,36,0.1); }
-        .metric-card:hover.eff    { border-color: rgba(16,185,129,0.45);   box-shadow: 0 16px 40px rgba(16,185,129,0.15), inset 0 1px 0 rgba(16,185,129,0.1); }
+        .metric-card.curr {
+            background: linear-gradient(145deg, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0.04) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(139,92,246,0.2);
+            box-shadow: 0 8px 32px rgba(139,92,246,0.1), var(--lg-shadow);
+        }
+        .metric-card.curr::before { background: linear-gradient(90deg, transparent, rgba(139,92,246,0.9), transparent); }
 
-        .metric-icon { font-size: 26px; margin-bottom: 10px; }
-        .metric-card.volt  .metric-icon { color: var(--cyan);    filter: drop-shadow(0 0 8px rgba(56,189,248,0.5)); }
-        .metric-card.curr  .metric-icon { color: var(--violet);  filter: drop-shadow(0 0 8px rgba(129,140,248,0.5)); }
-        .metric-card.power .metric-icon { color: var(--amber);   filter: drop-shadow(0 0 8px rgba(245,158,11,0.5)); }
-        .metric-card.temp  .metric-icon { color: var(--rose);    filter: drop-shadow(0 0 8px rgba(244,63,94,0.5)); }
-        .metric-card.lux   .metric-icon { color: var(--yellow);  filter: drop-shadow(0 0 8px rgba(251,191,36,0.5)); }
-        .metric-card.eff   .metric-icon { color: var(--emerald); filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)); }
+        .metric-card.power {
+            background: linear-gradient(145deg, rgba(251,146,60,0.12) 0%, rgba(251,146,60,0.04) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(251,146,60,0.2);
+            box-shadow: 0 8px 32px rgba(251,146,60,0.1), var(--lg-shadow);
+        }
+        .metric-card.power::before { background: linear-gradient(90deg, transparent, rgba(251,146,60,0.9), transparent); }
+
+        .metric-card.temp {
+            background: linear-gradient(145deg, rgba(244,63,94,0.12) 0%, rgba(244,63,94,0.04) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(244,63,94,0.2);
+            box-shadow: 0 8px 32px rgba(244,63,94,0.1), var(--lg-shadow);
+        }
+        .metric-card.temp::before { background: linear-gradient(90deg, transparent, rgba(244,63,94,0.9), transparent); }
+
+        .metric-card.lux {
+            background: linear-gradient(145deg, rgba(250,204,21,0.1) 0%, rgba(250,204,21,0.04) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(250,204,21,0.18);
+            box-shadow: 0 8px 32px rgba(250,204,21,0.08), var(--lg-shadow);
+        }
+        .metric-card.lux::before { background: linear-gradient(90deg, transparent, rgba(250,204,21,0.9), transparent); }
+
+        .metric-card.eff {
+            background: linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(20,184,166,0.06) 50%, rgba(4,8,26,0.4) 100%);
+            border: 1px solid rgba(16,185,129,0.2);
+            box-shadow: 0 8px 32px rgba(16,185,129,0.1), var(--lg-shadow);
+        }
+        .metric-card.eff::before { background: linear-gradient(90deg, transparent, rgba(16,185,129,0.9), transparent); }
+
+        .metric-card:hover { transform: translateY(-6px); }
+        .metric-card.volt:hover  { border-color: rgba(56,189,248,0.5);  box-shadow: 0 20px 50px rgba(56,189,248,0.2), var(--lg-shadow); }
+        .metric-card.curr:hover  { border-color: rgba(139,92,246,0.5);  box-shadow: 0 20px 50px rgba(139,92,246,0.2), var(--lg-shadow); }
+        .metric-card.power:hover { border-color: rgba(251,146,60,0.5);  box-shadow: 0 20px 50px rgba(251,146,60,0.2), var(--lg-shadow); }
+        .metric-card.temp:hover  { border-color: rgba(244,63,94,0.5);   box-shadow: 0 20px 50px rgba(244,63,94,0.2), var(--lg-shadow); }
+        .metric-card.lux:hover   { border-color: rgba(250,204,21,0.45); box-shadow: 0 20px 50px rgba(250,204,21,0.15), var(--lg-shadow); }
+        .metric-card.eff:hover   { border-color: rgba(16,185,129,0.5);  box-shadow: 0 20px 50px rgba(16,185,129,0.2), var(--lg-shadow); }
+
+        .metric-icon { font-size: 28px; margin-bottom: 12px; }
+        .metric-card.volt  .metric-icon { color: var(--cyan);    filter: drop-shadow(0 0 10px rgba(56,189,248,0.6)); }
+        .metric-card.curr  .metric-icon { color: var(--violet);  filter: drop-shadow(0 0 10px rgba(139,92,246,0.6)); }
+        .metric-card.power .metric-icon { color: var(--amber);   filter: drop-shadow(0 0 10px rgba(251,146,60,0.6)); }
+        .metric-card.temp  .metric-icon { color: var(--rose);    filter: drop-shadow(0 0 10px rgba(244,63,94,0.6)); }
+        .metric-card.lux   .metric-icon { color: var(--yellow);  filter: drop-shadow(0 0 10px rgba(250,204,21,0.6)); }
+        .metric-card.eff   .metric-icon { color: var(--emerald); filter: drop-shadow(0 0 10px rgba(16,185,129,0.6)); }
 
         .metric-label {
             font-size: 10px; font-family: var(--font-mono);
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 8px;
+            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.2px;
+            margin-bottom: 10px;
         }
         .metric-value {
             font-family: var(--font-mono); font-size: 28px; font-weight: 700;
-            color: var(--text-primary); line-height: 1;
-            margin-bottom: 6px;
+            color: var(--text-primary); line-height: 1; margin-bottom: 7px;
+        }
+        /* FIX: hiệu suất card dùng font-mono explicit */
+        .metric-card.eff .metric-value {
+            font-family: var(--font-mono) !important;
+            font-size: 28px !important;
         }
         .metric-sub {
-            font-size: 11px; font-family: var(--font-mono);
-            color: var(--text-secondary);
+            font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);
         }
 
-        /* CHARTS */
+        /* ══════════════════════════
+           CHARTS
+        ══════════════════════════ */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 14px; margin-bottom: 20px;
         }
 
         .chart-card {
-            background: rgba(6, 14, 35, 0.5);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            background: linear-gradient(145deg,
+                rgba(255,255,255,0.055) 0%,
+                rgba(255,255,255,0.02) 50%,
+                rgba(4,8,26,0.5) 100%);
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: var(--lg-shadow);
             border-radius: var(--radius);
-            padding: 16px;
-            height: 260px;
+            padding: 18px; height: 240px;
             display: flex; flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .chart-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 5%; right: 5%;
+            content: ''; position: absolute; top: 0; left: 5%; right: 5%;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
+
+        /* Unique tint per chart */
+        .chart-card:nth-child(1) { border-color: rgba(56,189,248,0.15); box-shadow: 0 4px 24px rgba(56,189,248,0.06), var(--lg-shadow); }
+        .chart-card:nth-child(2) { border-color: rgba(139,92,246,0.15); box-shadow: 0 4px 24px rgba(139,92,246,0.06), var(--lg-shadow); }
+        .chart-card:nth-child(3) { border-color: rgba(251,146,60,0.15);  box-shadow: 0 4px 24px rgba(251,146,60,0.06), var(--lg-shadow); }
 
         .chart-card .chart-title {
             font-size: 11px; font-family: var(--font-mono);
@@ -395,54 +423,48 @@
             letter-spacing: 1px; margin-bottom: 12px;
             display: flex; align-items: center; gap: 8px;
         }
-
         .chart-card canvas { flex: 1; min-height: 0; }
 
-        /* FOOTER STATUS BAR */
+        /* ══════════════════════════
+           STATUS BAR
+        ══════════════════════════ */
         .status-bar {
-            background: rgba(6, 14, 35, 0.5);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            background: linear-gradient(135deg,
+                rgba(255,255,255,0.06) 0%,
+                rgba(255,255,255,0.02) 100%);
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: var(--lg-shadow);
             border-radius: var(--radius);
-            padding: 14px 20px;
+            padding: 14px 22px;
             display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
             font-family: var(--font-mono); font-size: 12px;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .status-bar::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 5%; right: 5%;
+            content: ''; position: absolute; top: 0; left: 5%; right: 5%;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
 
         .status-items { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
         .status-item { display: flex; align-items: center; gap: 6px; }
         .status-dot-live {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--emerald);
-            box-shadow: 0 0 10px var(--emerald);
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--emerald); box-shadow: 0 0 12px var(--emerald);
             animation: liveDot 2s ease-in-out infinite;
         }
         @keyframes liveDot {
-            0%,100% { opacity: 1; box-shadow: 0 0 10px var(--emerald); }
-            50%      { opacity: 0.4; box-shadow: 0 0 4px var(--emerald); }
+            0%,100% { opacity: 1; box-shadow: 0 0 12px var(--emerald); }
+            50%      { opacity: 0.35; box-shadow: 0 0 4px var(--emerald); }
         }
-        .status-dot-live.dead {
-            background: var(--rose); box-shadow: 0 0 8px var(--rose);
-            animation: none;
-        }
+        .status-dot-live.dead { background: var(--rose); box-shadow: 0 0 10px var(--rose); animation: none; }
 
-        /* ══════════════════════════════════════
-           PAGE 2 — SENSOR STATUS
-        ══════════════════════════════════════ */
-        .sensors-header {
-            display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-        }
+        /* ══════════════════════════
+           SENSOR PAGE
+        ══════════════════════════ */
+        .sensors-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .sensors-header h2 { font-size: 18px; font-weight: 700; color: var(--text-primary); }
         .sensors-header p { font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 2px; }
 
@@ -453,37 +475,33 @@
         }
 
         .sensor-card {
-            background: rgba(6, 14, 35, 0.5);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            box-shadow: var(--lg-shadow);
             border-radius: var(--radius);
-            padding: 24px 20px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
+            padding: 24px 20px; position: relative; overflow: hidden; transition: 0.3s;
         }
         .sensor-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 5%; right: 5%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            content: ''; position: absolute; top: 0; left: 5%; right: 5%;
+            height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+        }
+        .sensor-card.online  {
+            background: linear-gradient(145deg, rgba(16,185,129,0.1), rgba(20,184,166,0.04), rgba(4,8,26,0.45));
+            border: 1px solid rgba(16,185,129,0.25);
+        }
+        .sensor-card.offline {
+            background: linear-gradient(145deg, rgba(244,63,94,0.1), rgba(244,63,94,0.04), rgba(4,8,26,0.45));
+            border: 1px solid rgba(244,63,94,0.25);
+        }
+        .sensor-card.warning {
+            background: linear-gradient(145deg, rgba(251,146,60,0.1), rgba(251,146,60,0.04), rgba(4,8,26,0.45));
+            border: 1px solid rgba(251,146,60,0.25);
         }
 
-        .sensor-card.online  { border-color: rgba(16,185,129,0.3); }
-        .sensor-card.offline { border-color: rgba(244,63,94,0.3); }
-        .sensor-card.warning { border-color: rgba(245,158,11,0.3); }
-
         .sensor-glow {
-            position: absolute;
-            top: 0; right: 0;
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            transform: translate(40px, -40px);
-            opacity: 0.07;
-            filter: blur(20px);
+            position: absolute; top: 0; right: 0;
+            width: 120px; height: 120px; border-radius: 50%;
+            transform: translate(50px,-50px); opacity: 0.12; filter: blur(24px);
         }
         .sensor-card.online  .sensor-glow { background: var(--emerald); }
         .sensor-card.offline .sensor-glow { background: var(--rose); }
@@ -494,41 +512,37 @@
         .sensor-type { font-size: 11px; color: var(--text-secondary); margin-top: 3px; font-family: var(--font-mono); }
 
         .sensor-badge {
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(8px);
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; font-family: var(--font-mono); letter-spacing: 0.5px;
+            backdrop-filter: blur(12px);
         }
-        .badge-online  { background: rgba(16,185,129,0.12); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
-        .badge-offline { background: rgba(244,63,94,0.12);  color: var(--rose);    border: 1px solid rgba(244,63,94,0.3); }
-        .badge-warning { background: rgba(245,158,11,0.12); color: var(--amber);   border: 1px solid rgba(245,158,11,0.3); }
+        .badge-online  { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.35); }
+        .badge-offline { background: rgba(244,63,94,0.15);  color: var(--rose);    border: 1px solid rgba(244,63,94,0.35); }
+        .badge-warning { background: rgba(251,146,60,0.15); color: var(--amber);   border: 1px solid rgba(251,146,60,0.35); }
 
         .sensor-metrics { display: flex; flex-direction: column; gap: 8px; }
         .sensor-metric-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 12px;
-            background: rgba(5,11,24,0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.04);
-            border-radius: 8px; font-family: var(--font-mono); font-size: 12px;
+            padding: 9px 13px;
+            background: rgba(4,8,26,0.35);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px; font-family: var(--font-mono); font-size: 12px;
         }
         .sensor-metric-row .sm-key { color: var(--text-secondary); }
-        .sensor-metric-row .sm-val { color: var(--text-primary); font-weight: 600; }
+        .sensor-metric-row .sm-val { font-weight: 600; }
 
         .sensor-i2c {
-            margin-top: 14px;
-            padding: 8px 12px;
-            background: rgba(56,189,248,0.04);
-            border: 1px solid rgba(56,189,248,0.12);
-            border-radius: 8px;
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--cyan);
-            display: flex; justify-content: space-between;
+            margin-top: 14px; padding: 9px 13px;
+            background: rgba(56,189,248,0.05);
+            border: 1px solid rgba(56,189,248,0.14);
+            border-radius: 10px; font-family: var(--font-mono); font-size: 11px;
+            color: var(--cyan); display: flex; justify-content: space-between;
         }
 
-        /* ══════════════════════════════════════
-           PAGE 3 — ERROR HISTORY
-        ══════════════════════════════════════ */
+        /* ══════════════════════════
+           ERROR LOG PAGE
+        ══════════════════════════ */
         .error-header {
             display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
@@ -537,14 +551,14 @@
         .error-header p  { font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 3px; }
 
         .btn-clear-errors {
-            padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s;
-            background: rgba(244,63,94,0.08);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(244,63,94,0.3);
+            padding: 9px 18px; border-radius: 10px; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(135deg, rgba(244,63,94,0.1), rgba(236,72,153,0.06));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(244,63,94,0.28);
             color: var(--rose); font-family: var(--font-mono); font-size: 12px;
             display: flex; align-items: center; gap: 6px;
         }
-        .btn-clear-errors:hover { background: rgba(244,63,94,0.18); }
+        .btn-clear-errors:hover { background: linear-gradient(135deg, rgba(244,63,94,0.22), rgba(236,72,153,0.14)); }
 
         .error-stats {
             display: grid;
@@ -553,30 +567,29 @@
         }
 
         .err-stat-card {
-            background: rgba(6, 14, 35, 0.5);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            border-radius: var(--radius); padding: 16px; text-align: center;
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            border-radius: var(--radius); padding: 18px; text-align: center;
             position: relative; overflow: hidden;
         }
+        .err-stat-card:nth-child(1) { background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(4,8,26,0.4));    border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--lg-shadow); }
+        .err-stat-card:nth-child(2) { background: linear-gradient(145deg, rgba(244,63,94,0.1), rgba(4,8,26,0.4));       border: 1px solid rgba(244,63,94,0.2);   box-shadow: 0 4px 20px rgba(244,63,94,0.08), var(--lg-shadow); }
+        .err-stat-card:nth-child(3) { background: linear-gradient(145deg, rgba(251,146,60,0.1), rgba(4,8,26,0.4));      border: 1px solid rgba(251,146,60,0.2);  box-shadow: 0 4px 20px rgba(251,146,60,0.08), var(--lg-shadow); }
+        .err-stat-card:nth-child(4) { background: linear-gradient(145deg, rgba(56,189,248,0.08), rgba(4,8,26,0.4));     border: 1px solid rgba(56,189,248,0.15); box-shadow: 0 4px 20px rgba(56,189,248,0.06), var(--lg-shadow); }
+
         .err-stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 10%; right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            content: ''; position: absolute; top: 0; left: 10%; right: 10%;
+            height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
         }
         .err-stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
-        .err-stat-lbl { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px; }
+        .err-stat-lbl { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 5px; }
 
         .error-log-container {
-            background: rgba(6, 14, 35, 0.5);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(4,8,26,0.5));
+            backdrop-filter: var(--lg-blur);
+            -webkit-backdrop-filter: var(--lg-blur);
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: var(--lg-shadow);
             border-radius: var(--radius); overflow: hidden;
         }
 
@@ -594,17 +607,14 @@
         #error-log-body { max-height: 380px; overflow-y: auto; }
         #error-log-body::-webkit-scrollbar { width: 4px; }
         #error-log-body::-webkit-scrollbar-track { background: transparent; }
-        #error-log-body::-webkit-scrollbar-thumb { background: var(--border-hot); border-radius: 4px; }
+        #error-log-body::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.3); border-radius: 4px; }
 
         .error-row {
             padding: 12px 20px;
-            display: grid;
-            grid-template-columns: 160px 120px 1fr 120px;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: grid; grid-template-columns: 160px 120px 1fr 120px;
+            gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
             font-family: var(--font-mono); font-size: 12px;
-            transition: 0.2s;
-            align-items: center;
+            transition: 0.2s; align-items: center;
         }
         .error-row:hover { background: rgba(56,189,248,0.04); }
         .error-row:last-child { border-bottom: none; }
@@ -613,74 +623,73 @@
         .err-device { color: var(--cyan); font-weight: 600; }
         .err-msg { color: var(--text-primary); }
         .err-level { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-align: center; backdrop-filter: blur(8px); }
-        .level-critical { background: rgba(244,63,94,0.12); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
-        .level-warning  { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-        .level-info     { background: rgba(56,189,248,0.08);  color: var(--cyan);  border: 1px solid rgba(56,189,248,0.2); }
+        .level-critical { background: rgba(244,63,94,0.12);  color: var(--rose);   border: 1px solid rgba(244,63,94,0.3); }
+        .level-warning  { background: rgba(251,146,60,0.12); color: var(--amber);  border: 1px solid rgba(251,146,60,0.3); }
+        .level-info     { background: rgba(56,189,248,0.08); color: var(--cyan);   border: 1px solid rgba(56,189,248,0.2); }
 
         .no-errors {
             padding: 60px 20px; text-align: center;
             font-family: var(--font-mono); color: var(--text-secondary);
         }
-        .no-errors i { font-size: 40px; color: var(--emerald); margin-bottom: 14px; display: block; filter: drop-shadow(0 0 12px rgba(16,185,129,0.5)); }
+        .no-errors i { font-size: 40px; color: var(--emerald); margin-bottom: 14px; display: block; filter: drop-shadow(0 0 14px rgba(16,185,129,0.5)); }
 
-        /* ══════════════════════════════════════
-           BOTTOM NAVIGATION
-        ══════════════════════════════════════ */
+        /* ══════════════════════════
+           BOTTOM NAV
+        ══════════════════════════ */
         .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             height: var(--nav-h);
-            background: rgba(5, 11, 24, 0.75);
-            backdrop-filter: blur(28px) saturate(200%);
-            -webkit-backdrop-filter: blur(28px) saturate(200%);
-            border-top: 1px solid var(--glass-border);
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            background: linear-gradient(90deg,
+                rgba(56,189,248,0.04) 0%,
+                rgba(4,8,26,0.8) 20%,
+                rgba(4,8,26,0.8) 80%,
+                rgba(139,92,246,0.04) 100%);
+            backdrop-filter: blur(36px) saturate(220%);
+            -webkit-backdrop-filter: blur(36px) saturate(220%);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07);
             display: flex; align-items: center; justify-content: space-around;
-            z-index: 50;
-            padding: 0 8px;
+            z-index: 50; padding: 0 8px;
         }
 
         .nav-tab {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; padding: 8px; cursor: pointer; border-radius: 12px;
+            gap: 4px; padding: 8px; cursor: pointer; border-radius: 14px;
             transition: all 0.25s; position: relative; user-select: none;
             border: none; background: transparent;
         }
-
         .nav-tab i { font-size: 18px; color: var(--text-dim); transition: 0.25s; }
         .nav-tab span { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); transition: 0.25s; letter-spacing: 0.5px; }
 
         .nav-tab.active {
-            background: rgba(56,189,248,0.08);
-            backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(139,92,246,0.06));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56,189,248,0.15);
         }
-        .nav-tab.active i   { color: var(--cyan); filter: drop-shadow(0 0 8px rgba(56,189,248,0.5)); }
+        .nav-tab.active i    { color: var(--cyan); filter: drop-shadow(0 0 10px rgba(56,189,248,0.6)); }
         .nav-tab.active span { color: var(--cyan); }
-
         .nav-tab.active::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 20%; right: 20%;
+            content: ''; position: absolute; top: 0; left: 20%; right: 20%;
             height: 2px; border-radius: 0 0 4px 4px;
-            background: var(--cyan);
-            box-shadow: 0 0 12px var(--cyan);
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            box-shadow: 0 0 14px var(--cyan);
         }
-
         .nav-tab:hover:not(.active) { background: rgba(56,189,248,0.04); }
         .nav-tab:hover:not(.active) i { color: var(--text-secondary); }
 
         .nav-badge {
             position: absolute; top: 6px; right: calc(50% - 18px);
-            background: var(--rose); color: #fff;
-            font-size: 10px; font-weight: 700; font-family: var(--font-mono);
-            width: 16px; height: 16px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--rose), var(--pink));
+            color: #fff; font-size: 10px; font-weight: 700; font-family: var(--font-mono);
+            width: 17px; height: 17px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             border: 1.5px solid var(--bg-deep);
+            box-shadow: 0 0 10px rgba(244,63,94,0.5);
         }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-hot); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.25); border-radius: 4px; }
 
         @media (max-width: 600px) {
             .header-left h1 { display: none; }
@@ -692,7 +701,9 @@
     </style>
 </head>
 <body>
+<div class="orb1"></div>
 <div class="orb2"></div>
+<div class="orb3"></div>
 
 <!-- ══════════ LOGIN ══════════ -->
 <div id="login-screen">
@@ -786,15 +797,15 @@
 
             <div class="charts-grid">
                 <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-bolt" style="color:var(--cyan)"></i> Điện Áp U (V) — 2 giờ</div>
+                    <div class="chart-title"><i class="fa-solid fa-bolt" style="color:var(--cyan)"></i> Điện Áp U (V)</div>
                     <canvas id="chart-voltage"></canvas>
                 </div>
                 <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-wave-square" style="color:var(--violet)"></i> Dòng Điện I (A) — 2 giờ</div>
+                    <div class="chart-title"><i class="fa-solid fa-wave-square" style="color:var(--violet)"></i> Dòng Điện I (A)</div>
                     <canvas id="chart-current"></canvas>
                 </div>
                 <div class="chart-card">
-                    <div class="chart-title"><i class="fa-solid fa-chart-area" style="color:var(--amber)"></i> Công Suất P (W) — 2 giờ</div>
+                    <div class="chart-title"><i class="fa-solid fa-chart-area" style="color:var(--amber)"></i> Công Suất P (W)</div>
                     <canvas id="chart-power"></canvas>
                 </div>
             </div>
@@ -908,9 +919,6 @@
 </div><!-- /app -->
 
 <script>
-// ═══════════════════════════════════════════════
-// CONSTANTS & STATE
-// ═══════════════════════════════════════════════
 const API_URL = "https://esp32-backend-vqfp.onrender.com/api/data";
 const MAX_CHART_POINTS = 120;
 
@@ -924,89 +932,35 @@ let fetchInterval = null;
 let connInterval = null;
 
 const SENSORS = [
-    {
-        id: 'INA226', name: 'INA226', type: 'Cảm biến dòng/áp — I²C', address: '0x40',
-        fields: ['Điện áp (U)', 'Dòng điện (I)', 'Công suất (P)'],
-        fieldIds: ['dien_ap', 'dong_dien', 'cong_suat'],
-        fieldSuffix: ['V', 'A', 'W'], color: 'var(--cyan)'
-    },
-    {
-        id: 'VEML7700', name: 'VEML7700', type: 'Cảm biến ánh sáng — I²C', address: '0x10',
-        fields: ['Cường độ sáng'], fieldIds: ['anh_sang'], fieldSuffix: ['Lux'], color: 'var(--yellow)'
-    },
-    {
-        id: 'MPU6050', name: 'MPU6050', type: 'Cảm biến gia tốc/góc — I²C', address: '0x68',
-        fields: ['Góc nghiêng X', 'Góc xoay Y'], fieldIds: ['goc_x', 'goc_y'],
-        fieldSuffix: ['°', '°'], color: 'var(--violet)'
-    },
-    {
-        id: 'DS18B20', name: 'DS18B20', type: 'Cảm biến nhiệt độ — 1-Wire', address: 'GPIO 4',
-        fields: ['Nhiệt độ pin'], fieldIds: ['nhiet_do'], fieldSuffix: ['°C'], color: 'var(--rose)'
-    }
+    { id:'INA226',   name:'INA226',   type:'Cảm biến dòng/áp — I²C',      address:'0x40',   fields:['Điện áp (U)','Dòng điện (I)','Công suất (P)'], fieldIds:['dien_ap','dong_dien','cong_suat'], fieldSuffix:['V','A','W'],      color:'var(--cyan)' },
+    { id:'VEML7700', name:'VEML7700', type:'Cảm biến ánh sáng — I²C',      address:'0x10',   fields:['Cường độ sáng'],                               fieldIds:['anh_sang'],                       fieldSuffix:['Lux'],             color:'var(--yellow)' },
+    { id:'MPU6050',  name:'MPU6050',  type:'Cảm biến gia tốc/góc — I²C',   address:'0x68',   fields:['Góc nghiêng X','Góc xoay Y'],                  fieldIds:['goc_x','goc_y'],                  fieldSuffix:['°','°'],           color:'var(--violet)' },
+    { id:'DS18B20',  name:'DS18B20',  type:'Cảm biến nhiệt độ — 1-Wire',   address:'GPIO 4', fields:['Nhiệt độ pin'],                                fieldIds:['nhiet_do'],                       fieldSuffix:['°C'],              color:'var(--rose)' }
 ];
 
-// ═══════════════════════════════════════════════
-// HELPERS — parse ISO timestamp → local time
-// ═══════════════════════════════════════════════
-/**
- * Parse created_at (ISO 8601, stored as UTC in Supabase) → local Date object
- * Handles both "2024-01-15T08:30:00" (no Z) and "2024-01-15T08:30:00Z"
- * Supabase returns without Z suffix but value is UTC — append Z to parse correctly.
- */
 function parseTimestamp(raw) {
     if (!raw) return new Date();
-    // If already has timezone info, parse directly
-    if (raw.endsWith('Z') || raw.includes('+')) {
-        return new Date(raw);
-    }
-    // Supabase: no Z suffix but value is UTC
+    if (raw.endsWith('Z') || raw.includes('+')) return new Date(raw);
     return new Date(raw + 'Z');
 }
-
-/**
- * Format Date → "HH:MM:SS" in local time (for chart label)
- */
 function formatTimeLabel(date) {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    const ss = String(date.getSeconds()).padStart(2, '0');
-    return `${hh}:${mm}:${ss}`;
+    return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}:${String(date.getSeconds()).padStart(2,'0')}`;
 }
-
-/**
- * Format Date → "HH:MM:SS DD/MM/YYYY" in local time (for Excel & error log)
- */
 function formatDateTimeFull(date) {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    const ss = String(date.getSeconds()).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mo = String(date.getMonth() + 1).padStart(2, '0');
-    const yy = date.getFullYear();
+    const hh=String(date.getHours()).padStart(2,'0'), mm=String(date.getMinutes()).padStart(2,'0'), ss=String(date.getSeconds()).padStart(2,'0');
+    const dd=String(date.getDate()).padStart(2,'0'), mo=String(date.getMonth()+1).padStart(2,'0'), yy=date.getFullYear();
     return `${hh}:${mm}:${ss} ${dd}/${mo}/${yy}`;
 }
 
-// ═══════════════════════════════════════════════
-// CLOCK
-// ═══════════════════════════════════════════════
 function updateClock() {
     const now = new Date();
-    const hh = String(now.getHours()).padStart(2,'0');
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-    const dd = String(now.getDate()).padStart(2,'0');
-    const mo = String(now.getMonth()+1).padStart(2,'0');
-    const yy = now.getFullYear();
+    document.getElementById('clock').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
     const days = ['CN','T2','T3','T4','T5','T6','T7'];
-    document.getElementById('clock-date').textContent = `${days[now.getDay()]} ${dd}/${mo}/${yy}`;
+    document.getElementById('clock-date').textContent = `${days[now.getDay()]} ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-// ═══════════════════════════════════════════════
-// PAGE NAVIGATION
-// ═══════════════════════════════════════════════
 function switchPage(page) {
     ['dashboard','sensors','errors'].forEach(p => {
         document.getElementById('page-'+p).classList.remove('active');
@@ -1014,13 +968,10 @@ function switchPage(page) {
     });
     document.getElementById('page-'+page).classList.add('active');
     document.getElementById('nav-'+page).classList.add('active');
-    if (page === 'errors') { errorBadgeCount = 0; updateErrorBadge(); }
+    if (page === 'errors')  { errorBadgeCount = 0; updateErrorBadge(); }
     if (page === 'sensors') renderSensorGrid();
 }
 
-// ═══════════════════════════════════════════════
-// LOGIN / LOGOUT
-// ═══════════════════════════════════════════════
 function handleLogin() {
     const u = document.getElementById('txt-username').value.trim();
     const p = document.getElementById('txt-password').value.trim();
@@ -1030,7 +981,7 @@ function handleLogin() {
         document.getElementById('app').style.display = 'flex';
         initCharts();
         lastRenderedId = null;
-        addErrorLog('INFO', 'Hệ thống', 'Đăng nhập thành công — user: ' + u);
+        addErrorLog('INFO','Hệ thống','Đăng nhập thành công — user: '+u);
         if (fetchInterval) clearInterval(fetchInterval);
         if (connInterval)  clearInterval(connInterval);
         loadSolarData();
@@ -1049,9 +1000,6 @@ function handleLogout() {
     document.getElementById('login-error').style.display = 'none';
 }
 
-// ═══════════════════════════════════════════════
-// CHARTS INIT
-// ═══════════════════════════════════════════════
 function initCharts() {
     const opts = () => ({
         responsive: true,
@@ -1060,17 +1008,11 @@ function initCharts() {
         plugins: { legend: { display: false } },
         scales: {
             x: {
-                ticks: {
-                    color: '#475569',
-                    font: { size: 9, family: 'JetBrains Mono' },
-                    maxTicksLimit: 8,
-                    maxRotation: 0
-                },
-                grid: { display: false },
-                border: { color: 'rgba(255,255,255,0.05)' }
+                // ✅ Ẩn hoàn toàn nhãn trục X
+                display: false
             },
             y: {
-                ticks: { color: '#475569', font: { size: 10, family: 'JetBrains Mono' } },
+                ticks: { color: '#4a6080', font: { size: 10, family: 'JetBrains Mono' } },
                 grid: { color: 'rgba(255,255,255,0.04)' },
                 border: { color: 'rgba(255,255,255,0.05)' }
             }
@@ -1079,42 +1021,35 @@ function initCharts() {
 
     chartU = new Chart(document.getElementById('chart-voltage').getContext('2d'), {
         type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
+        data: { labels:[], datasets:[{ data:[], borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)', tension:0.4, fill:true, borderWidth:1.8, pointRadius:0, pointHoverRadius:4 }] },
         options: opts()
     });
     chartI = new Chart(document.getElementById('chart-current').getContext('2d'), {
         type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#818cf8', backgroundColor: 'rgba(129,140,248,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
+        data: { labels:[], datasets:[{ data:[], borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.08)', tension:0.4, fill:true, borderWidth:1.8, pointRadius:0, pointHoverRadius:4 }] },
         options: opts()
     });
     chartP = new Chart(document.getElementById('chart-power').getContext('2d'), {
         type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', tension: 0.4, fill: true, borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4 }] },
+        data: { labels:[], datasets:[{ data:[], borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', tension:0.4, fill:true, borderWidth:1.8, pointRadius:0, pointHoverRadius:4 }] },
         options: opts()
     });
 }
 
 function updateChartsRealtime(timeLabel, uVal, iVal, pVal) {
-    [chartU, chartI, chartP].forEach(chart => {
-        if (chart.data.labels.length >= MAX_CHART_POINTS) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
-        }
+    [chartU,chartI,chartP].forEach(c => {
+        if (c.data.labels.length >= MAX_CHART_POINTS) { c.data.labels.shift(); c.data.datasets[0].data.shift(); }
     });
     chartU.data.labels.push(timeLabel); chartU.data.datasets[0].data.push(uVal); chartU.update('none');
     chartI.data.labels.push(timeLabel); chartI.data.datasets[0].data.push(iVal); chartI.update('none');
     chartP.data.labels.push(timeLabel); chartP.data.datasets[0].data.push(pVal); chartP.update('none');
 }
 
-// ═══════════════════════════════════════════════
-// DATA FETCH
-// ═══════════════════════════════════════════════
 function loadSolarData() {
     fetch(API_URL)
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            if (!data || data.length === 0) return;
-
+            if (!data || data.length===0) return;
             localDataLogs = data;
             const latest = data[0];
             lastDataTimestamp = Date.now();
@@ -1142,35 +1077,26 @@ function loadSolarData() {
 
             const gocX = +(latest.goc_x ?? 0);
             const gocY = +(latest.goc_y ?? 0);
-            const gocZ = Math.abs(gocX - gocY);
             document.getElementById('lbl-x').textContent      = gocX + '°';
             document.getElementById('lbl-y').textContent      = gocY + '°';
-            document.getElementById('lbl-z-axis').textContent = gocZ + '°';
+            document.getElementById('lbl-z-axis').textContent = Math.abs(gocX - gocY) + '°';
             document.getElementById('lbl-z').textContent      = tempVal + '°C';
 
             checkThresholds(uVal, iVal, pVal, tempVal);
 
-            // Push to chart only when new record
             const currentId = latest.id ?? latest.created_at;
             if (currentId !== lastRenderedId) {
                 lastRenderedId = currentId;
-
-                // ✅ FIX: Parse created_at as UTC → convert to local time for label
                 const localDate = parseTimestamp(latest.created_at);
-                const timeLabel = formatTimeLabel(localDate);
-
-                updateChartsRealtime(timeLabel, uVal, iVal, pVal);
+                updateChartsRealtime(formatTimeLabel(localDate), uVal, iVal, pVal);
             }
         })
         .catch(err => {
             console.error('Fetch error:', err);
-            addErrorLog('CRITICAL', 'ESP32', 'Lỗi kết nối API: ' + err.message);
+            addErrorLog('CRITICAL','ESP32','Lỗi kết nối API: '+err.message);
         });
 }
 
-// ═══════════════════════════════════════════════
-// DEVICE CONNECTION CHECK
-// ═══════════════════════════════════════════════
 let lastAlertState = false;
 function checkDeviceConnection() {
     if (lastDataTimestamp === null) return;
@@ -1179,28 +1105,21 @@ function checkDeviceConnection() {
     const alertBar = document.getElementById('device-alert-bar');
     const dot      = document.getElementById('status-dot');
     const lbl      = document.getElementById('lbl-time');
-
     alertBar.style.display = alert ? 'block' : 'none';
     dot.className = 'status-dot-live' + (alert ? ' dead' : '');
-    lbl.textContent = alert ? 'MẤT KẾT NỐI (>' + Math.floor(diff) + 's)' : 'Đang kết nối';
+    lbl.textContent = alert ? 'MẤT KẾT NỐI (>'+Math.floor(diff)+'s)' : 'Đang kết nối';
     lbl.style.color = alert ? 'var(--rose)' : 'var(--emerald)';
-
-    if (alert && !lastAlertState) {
-        addErrorLog('CRITICAL', 'ESP32', 'Mất kết nối thiết bị — không nhận được dữ liệu > 7 giây');
-    }
+    if (alert && !lastAlertState) addErrorLog('CRITICAL','ESP32','Mất kết nối thiết bị — không nhận được dữ liệu > 7 giây');
     lastAlertState = alert;
 }
 
-// ═══════════════════════════════════════════════
-// THRESHOLD ALERTS
-// ═══════════════════════════════════════════════
 let lastThresholdCheck = {};
 function checkThresholds(u, i, p, t) {
     const now = Date.now();
     const checks = [
-        { key: 'temp', cond: t > 45, dev: 'DS18B20', msg: `Nhiệt độ pin vượt ngưỡng: ${t}°C (>45°C)`, level: 'WARNING' },
-        { key: 'volt', cond: u > 240, dev: 'INA226',  msg: `Điện áp vượt ngưỡng: ${u.toFixed(1)}V (>240V)`, level: 'CRITICAL' },
-        { key: 'curr', cond: i > 2,   dev: 'INA226',  msg: `Dòng điện vượt ngưỡng: ${i.toFixed(2)}A (>2A)`,  level: 'WARNING' },
+        { key:'temp', cond:t>45,   dev:'DS18B20', msg:`Nhiệt độ pin vượt ngưỡng: ${t}°C (>45°C)`,           level:'WARNING' },
+        { key:'volt', cond:u>240,  dev:'INA226',  msg:`Điện áp vượt ngưỡng: ${u.toFixed(1)}V (>240V)`,      level:'CRITICAL' },
+        { key:'curr', cond:i>2,    dev:'INA226',  msg:`Dòng điện vượt ngưỡng: ${i.toFixed(2)}A (>2A)`,      level:'WARNING' },
     ];
     checks.forEach(c => {
         if (c.cond && (!lastThresholdCheck[c.key] || now - lastThresholdCheck[c.key] > 30000)) {
@@ -1210,95 +1129,63 @@ function checkThresholds(u, i, p, t) {
     });
 }
 
-// ═══════════════════════════════════════════════
-// ERROR LOG
-// ═══════════════════════════════════════════════
 function addErrorLog(level, device, msg) {
-    const now = new Date();
-    const ts = formatDateTimeFull(now);
-    errorLogs.unshift({ time: ts, device, msg, level });
+    const ts = formatDateTimeFull(new Date());
+    errorLogs.unshift({ time:ts, device, msg, level });
     if (errorLogs.length > 200) errorLogs.pop();
-
     const activePage = document.querySelector('.page.active');
-    if (!activePage || activePage.id !== 'page-errors') {
-        errorBadgeCount++;
-        updateErrorBadge();
-    }
+    if (!activePage || activePage.id !== 'page-errors') { errorBadgeCount++; updateErrorBadge(); }
     renderErrorLog();
 }
 
 function updateErrorBadge() {
     const badge = document.getElementById('error-badge');
-    if (errorBadgeCount > 0) {
-        badge.style.display = 'flex';
-        badge.textContent = errorBadgeCount > 99 ? '99+' : errorBadgeCount;
-    } else {
-        badge.style.display = 'none';
-    }
+    if (errorBadgeCount > 0) { badge.style.display='flex'; badge.textContent = errorBadgeCount>99?'99+':errorBadgeCount; }
+    else badge.style.display = 'none';
 }
 
 function renderErrorLog() {
     const body = document.getElementById('error-log-body');
-    const total    = errorLogs.length;
-    const critical = errorLogs.filter(e => e.level === 'CRITICAL').length;
-    const warning  = errorLogs.filter(e => e.level === 'WARNING').length;
-    const info     = errorLogs.filter(e => e.level === 'INFO').length;
-
-    document.getElementById('stat-total').textContent    = total;
-    document.getElementById('stat-critical').textContent = critical;
-    document.getElementById('stat-warning').textContent  = warning;
-    document.getElementById('stat-info').textContent     = info;
-
-    if (total === 0) {
-        body.innerHTML = `<div class="no-errors"><i class="fa-solid fa-circle-check"></i>Không có lỗi nào được ghi nhận</div>`;
-        return;
-    }
-
-    const levelClass = { CRITICAL: 'level-critical', WARNING: 'level-warning', INFO: 'level-info' };
-    body.innerHTML = errorLogs.map(e => `
+    const total=errorLogs.length, critical=errorLogs.filter(e=>e.level==='CRITICAL').length;
+    const warning=errorLogs.filter(e=>e.level==='WARNING').length, info=errorLogs.filter(e=>e.level==='INFO').length;
+    document.getElementById('stat-total').textContent=total;
+    document.getElementById('stat-critical').textContent=critical;
+    document.getElementById('stat-warning').textContent=warning;
+    document.getElementById('stat-info').textContent=info;
+    if (total===0) { body.innerHTML=`<div class="no-errors"><i class="fa-solid fa-circle-check"></i>Không có lỗi nào được ghi nhận</div>`; return; }
+    const lc = { CRITICAL:'level-critical', WARNING:'level-warning', INFO:'level-info' };
+    body.innerHTML = errorLogs.map(e=>`
         <div class="error-row">
             <span class="err-time">${e.time}</span>
             <span class="err-device">${e.device}</span>
             <span class="err-msg">${e.msg}</span>
-            <span class="err-level ${levelClass[e.level] || 'level-info'}">${e.level}</span>
-        </div>
-    `).join('');
+            <span class="err-level ${lc[e.level]||'level-info'}">${e.level}</span>
+        </div>`).join('');
 }
 
 function clearErrors() {
     if (!confirm('Xóa toàn bộ lịch sử lỗi?')) return;
-    errorLogs = [];
-    errorBadgeCount = 0;
-    updateErrorBadge();
-    renderErrorLog();
+    errorLogs=[]; errorBadgeCount=0; updateErrorBadge(); renderErrorLog();
 }
 
-// ═══════════════════════════════════════════════
-// SENSOR STATUS PAGE
-// ═══════════════════════════════════════════════
 function renderSensorGrid() {
-    const latest = localDataLogs.length > 0 ? localDataLogs[0] : null;
-    const isConnected = lastDataTimestamp !== null && (Date.now() - lastDataTimestamp) < 7000;
-
+    const latest = localDataLogs.length>0 ? localDataLogs[0] : null;
+    const isConnected = lastDataTimestamp!==null && (Date.now()-lastDataTimestamp)<7000;
     const grid = document.getElementById('sensor-grid');
     grid.innerHTML = SENSORS.map(s => {
-        const hasData = latest !== null;
-        const status  = !isConnected ? 'offline' : (hasData ? 'online' : 'warning');
-        const badgeText  = { online: 'ONLINE', offline: 'OFFLINE', warning: 'CHỜ DỮ LIỆU' }[status];
-        const badgeClass = { online: 'badge-online', offline: 'badge-offline', warning: 'badge-warning' }[status];
-
-        const rows = s.fields.map((f, idx) => {
-            const rawVal = latest ? (latest[s.fieldIds[idx]] ?? '--') : '--';
-            const val = (rawVal !== '--' && rawVal !== null) ? rawVal : '--';
-            return `
-                <div class="sensor-metric-row">
-                    <span class="sm-key">${f}</span>
-                    <span class="sm-val" style="color:${s.color}">${val !== '--' ? Number(val).toFixed(2) + ' ' + s.fieldSuffix[idx] : '--'}</span>
-                </div>`;
+        const hasData = latest!==null;
+        const status  = !isConnected ? 'offline' : (hasData?'online':'warning');
+        const badgeText  = {online:'ONLINE',offline:'OFFLINE',warning:'CHỜ DỮ LIỆU'}[status];
+        const badgeClass = {online:'badge-online',offline:'badge-offline',warning:'badge-warning'}[status];
+        const rows = s.fields.map((f,idx)=>{
+            const rawVal = latest ? (latest[s.fieldIds[idx]]??'--') : '--';
+            const val = (rawVal!=='--'&&rawVal!==null) ? rawVal : '--';
+            return `<div class="sensor-metric-row">
+                <span class="sm-key">${f}</span>
+                <span class="sm-val" style="color:${s.color}">${val!=='--'?Number(val).toFixed(2)+' '+s.fieldSuffix[idx]:'--'}</span>
+            </div>`;
         }).join('');
-
-        return `
-        <div class="sensor-card ${status}">
+        return `<div class="sensor-card ${status}">
             <div class="sensor-glow"></div>
             <div class="sensor-top">
                 <div>
@@ -1308,68 +1195,39 @@ function renderSensorGrid() {
                 <span class="sensor-badge ${badgeClass}">${badgeText}</span>
             </div>
             <div class="sensor-metrics">${rows}</div>
-            <div class="sensor-i2c">
-                <span>Địa chỉ / Chân:</span>
-                <span>${s.address}</span>
-            </div>
+            <div class="sensor-i2c"><span>Địa chỉ / Chân:</span><span>${s.address}</span></div>
         </div>`;
     }).join('');
 }
 
-// ═══════════════════════════════════════════════
-// EXCEL EXPORT — ✅ FIX: thời gian local time
-// ═══════════════════════════════════════════════
 function exportToExcel() {
     if (!localDataLogs.length) { alert('Không có dữ liệu để xuất!'); return; }
     try {
-        const rows = localDataLogs.map((item, i) => {
-            const P       = item.cong_suat || 0;
-            const P_Light = (item.anh_sang || 0) * 0.0079;
-            const hs      = P_Light > 0 ? (P / P_Light * 100).toFixed(1) : 0;
-            const hsDK    = Math.min(95.5, parseFloat(hs) * 1.15 + 2.5).toFixed(1);
-
-            // ✅ Parse ISO UTC → local time string for Excel
-            const localDate = parseTimestamp(item.created_at);
-            const thoiGian  = formatDateTimeFull(localDate);
-
+        const rows = localDataLogs.map((item,i)=>{
+            const P=item.cong_suat||0, P_Light=(item.anh_sang||0)*0.0079;
+            const hs=P_Light>0?(P/P_Light*100).toFixed(1):0;
+            const hsDK=Math.min(95.5,parseFloat(hs)*1.15+2.5).toFixed(1);
+            const localDate=parseTimestamp(item.created_at);
             return {
-                'STT':                i + 1,
-                'Điện Áp U (V)':      item.dien_ap,
-                'Dòng Điện I (A)':    item.dong_dien,
-                'Công Suất P (W)':    P,
-                'Định Mức (W)':       50,
-                'Ánh Sáng (Lux)':     item.anh_sang,
-                'P_Light LT (W)':     P_Light.toFixed(2),
-                'Hiệu Suất Thực (%)': hs,
-                'Hiệu Suất DK (%)':   hsDK,
-                'Nhiệt Độ (°C)':      item.nhiet_do,
-                'Góc X':              item.goc_x,
-                'Góc Y':              item.goc_y,
-                'Góc Z':              Math.abs((item.goc_x||0) - (item.goc_y||0)),
-                'Thời Gian (Local)':  thoiGian
+                'STT':i+1,'Điện Áp U (V)':item.dien_ap,'Dòng Điện I (A)':item.dong_dien,
+                'Công Suất P (W)':P,'Định Mức (W)':50,'Ánh Sáng (Lux)':item.anh_sang,
+                'P_Light LT (W)':P_Light.toFixed(2),'Hiệu Suất Thực (%)':hs,'Hiệu Suất DK (%)':hsDK,
+                'Nhiệt Độ (°C)':item.nhiet_do,'Góc X':item.goc_x,'Góc Y':item.goc_y,
+                'Góc Z':Math.abs((item.goc_x||0)-(item.goc_y||0)),'Thời Gian (Local)':formatDateTimeFull(localDate)
             };
         });
-        const ws = XLSX.utils.json_to_sheet(rows);
-
-        // Auto column width
-        const colWidths = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, 14) }));
-        ws['!cols'] = colWidths;
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Solar_Data');
-
-        const now = new Date();
-        const fname = `BaoCao_Solar_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${now.getFullYear()}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.xlsx`;
-        XLSX.writeFile(wb, fname);
-    } catch(e) { alert('Lỗi xuất Excel: ' + e.message); }
+        const ws=XLSX.utils.json_to_sheet(rows);
+        ws['!cols']=Object.keys(rows[0]).map(k=>({wch:Math.max(k.length,14)}));
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,ws,'Solar_Data');
+        const now=new Date();
+        XLSX.writeFile(wb,`BaoCao_Solar_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${now.getFullYear()}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.xlsx`);
+    } catch(e) { alert('Lỗi xuất Excel: '+e.message); }
 }
 
-// ENTER key on login
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('txt-password').addEventListener('keydown', e => {
-        if (e.key === 'Enter') handleLogin();
-    });
+    document.getElementById('txt-password').addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
 });
 </script>
 </body>
-</html>
+</html> 
