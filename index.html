@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời</title>
+    <title>Hệ Thống Giám Sát Năng Lượng Mặt Trời - T-Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -949,7 +949,8 @@ function formatTimeLabel(date) {
 function formatDateTimeFull(date) {
     const hh=String(date.getHours()).padStart(2,'0'), mm=String(date.getMinutes()).padStart(2,'0'), ss=String(date.getSeconds()).padStart(2,'0');
     const dd=String(date.getDate()).padStart(2,'0'), mo=String(date.getMonth()+1).padStart(2,'0'), yy=date.getFullYear();
-    return `${hh}:${mm}:${ss} ${dd}/${mo}/${yy}`;
+    // Date first so Excel doesn't parse as time serial
+    return `${dd}/${mo}/${yy} ${hh}:${mm}:${ss}`;
 }
 
 function updateClock() {
@@ -1217,7 +1218,25 @@ function exportToExcel() {
             };
         });
         const ws=XLSX.utils.json_to_sheet(rows);
-        ws['!cols']=Object.keys(rows[0]).map(k=>({wch:Math.max(k.length,14)}));
+        ws['!cols']=Object.keys(rows[0]).map(k=>({wch:Math.max(k.length,22)}));
+
+        // Force "Thời Gian (Local)" column to Text format so Excel doesn't parse it as date/time
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
+        const timeColIdx = headers.indexOf('Thời Gian (Local)');
+        if (timeColIdx >= 0) {
+            for (let R = 0; R <= range.e.r; R++) {
+                const cellAddr = XLSX.utils.encode_cell({ r: R, c: timeColIdx });
+                if (ws[cellAddr]) {
+                    // Set cell type to string and format to text
+                    ws[cellAddr].t = 's';
+                    ws[cellAddr].z = '@';
+                    // Ensure value is pure string
+                    if (R > 0) ws[cellAddr].v = String(ws[cellAddr].v);
+                }
+            }
+        }
+
         const wb=XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb,ws,'Solar_Data');
         const now=new Date();
@@ -1230,4 +1249,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-</html> 
+</html>
