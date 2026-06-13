@@ -1,166 +1,823 @@
-// ============================================================
-//   HE THONG GIAM SAT SOLAR - TICH HOP TFT + WIFI + SENSOR
-//   Phien bản: Full hỗ trợ đẩy trạng thái kết nối lên Web
-// ============================================================
-
-#include <WiFi.h>
-#include <WiFiClientSecure.h>
-#include <HTTPClient.h>
-#include <ArduinoJson.h>
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
-#include <Wire.h>
-#include <INA226_WE.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_VEML7700.h>
-
-// ─── CHÂN KẾT NỐI ──────────────────────────────────────────
-#define TFT_CS       5
-#define TFT_DC       27
-#define TFT_RST      26
-#define ONE_WIRE_BUS 4
-#define PIN_BUZZER   13
-#define PIN_BTN_PAGE 32
-#define PIN_BTN_MUTE 33
-#define I2C_SDA      21
-#define I2C_SCL      22
-#define DEBOUNCE_MS  50
-#define LONG_PRESS_MS 3000
-
-// ─── WIFI & BACKEND ─────────────────────────────────────────
-const char* ssid         = "HONOR 400 pro";
-const char* password     = "        ";
-const char* serverTarget = "https://esp32-backend-vqfp.onrender.com/api/data";
-
-const unsigned long WIFI_SEND_INTERVAL = 5000;
-unsigned long lastWifiSend = 0;
-
-// ─── KHỞI TẠO ĐỐI TƯỢNG ────────────────────────────────────
-Adafruit_ILI9341  tft    = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
-INA226_WE         ina226 = INA226_WE(0x40);
-OneWire           oneWire(ONE_WIRE_BUS);
-DallasTemperature ds18b20(&oneWire);
-Adafruit_MPU6050  mpu;
-Adafruit_VEML7700 veml;
-
-// ─── BIẾN INTERRUPT ────────────────────────────────────────
-volatile bool     btnPageEvent    = false;
-volatile bool     btnMuteEvent    = false;
-volatile unsigned long btnPageDownTime = 0;
-
-// ─── ISR NÚT ───────────────────────────────────────────────
-void IRAM_ATTR isr_btnPage() {
-  if (digitalRead(PIN_BTN_PAGE) == LOW) { btnPageDownTime = millis(); }
-  else { if ((millis() - btnPageDownTime) >= DEBOUNCE_MS) btnPageEvent = true; }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-Digital Solar Monitor — NHÓM 2_3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg:      #04081a;
+  --cyan:    #38bdf8;
+  --violet:  #8b5cf6;
+  --amber:   #fb923c;
+  --emerald: #10b981;
+  --rose:    #f43f5e;
+  --yellow:  #facc15;
+  --indigo:  #6366f1;
+  --pink:    #ec4899;
+  --teal:    #14b8a6;
+  --lime:    #84cc16;
+  --txt:     #f0f6ff;
+  --txt2:    #7a90b0;
+  --txt3:    #2a3a55;
+  --mono:    'JetBrains Mono', monospace;
+  --disp:    'Exo 2', sans-serif;
+  --r:       18px;
+  --nav:     68px;
+  --blur:    blur(28px) saturate(220%);
+  --shadow:  0 8px 40px rgba(0,0,0,0.55), inset 0 1.5px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(255,255,255,0.04);
 }
-void IRAM_ATTR isr_btnMute() {
-  static unsigned long lastMuteISR = 0;
-  if (millis() - lastMuteISR >= DEBOUNCE_MS) { btnMuteEvent = true; lastMuteISR = millis(); }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--disp);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;position:relative;}
+
+/* BG layers */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 80% 50% at 20% 10%,rgba(56,189,248,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 40% at 80% 80%,rgba(139,92,246,.07) 0%,transparent 55%),
+  radial-gradient(ellipse 50% 60% at 50% 50%,rgba(236,72,153,.04) 0%,transparent 65%),
+  linear-gradient(180deg,#04081a 0%,#060c1e 50%,#04081a 100%);
+  pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background-image:
+  linear-gradient(rgba(56,189,248,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(56,189,248,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
+.orb1{position:fixed;top:-15%;left:-10%;width:55%;height:55%;background:radial-gradient(ellipse,rgba(56,189,248,.08) 0%,transparent 65%);pointer-events:none;z-index:0;animation:ob1 12s ease-in-out infinite alternate;}
+.orb2{position:fixed;bottom:-20%;right:-10%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(139,92,246,.08) 0%,transparent 65%);pointer-events:none;z-index:0;animation:ob2 15s ease-in-out infinite alternate;}
+.orb3{position:fixed;top:40%;left:60%;width:35%;height:35%;background:radial-gradient(ellipse,rgba(236,72,153,.05) 0%,transparent 65%);pointer-events:none;z-index:0;animation:ob3 10s ease-in-out infinite alternate;}
+@keyframes ob1{from{transform:scale(1) translate(0,0)}to{transform:scale(1.15) translate(2%,3%)}}
+@keyframes ob2{from{transform:scale(1.05)}to{transform:scale(.9) translate(-2%,-2%)}}
+@keyframes ob3{from{opacity:.6;transform:scale(1)}to{opacity:1;transform:scale(1.2)}}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
+.login-box{background:linear-gradient(145deg,rgba(56,189,248,.1),rgba(139,92,246,.08),rgba(236,72,153,.06));backdrop-filter:blur(40px) saturate(220%);border:1px solid rgba(255,255,255,.15);border-radius:32px;padding:52px 44px;width:100%;max-width:420px;box-shadow:0 0 80px rgba(56,189,248,.12),0 40px 80px rgba(0,0,0,.5),inset 0 1.5px 0 rgba(255,255,255,.2);position:relative;z-index:1;}
+.login-logo{text-align:center;margin-bottom:36px;}
+.icon-ring{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(139,92,246,.25));border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 40px rgba(56,189,248,.3);}
+.icon-ring i{font-size:30px;color:var(--cyan);filter:drop-shadow(0 0 10px var(--cyan));}
+.login-logo h2{font-size:19px;font-weight:700;letter-spacing:.5px;}
+.login-logo p{font-size:11px;color:var(--txt2);font-family:var(--mono);margin-top:5px;}
+.inp-wrap{margin-bottom:18px;}
+.inp-wrap label{display:block;font-size:11px;font-family:var(--mono);color:var(--cyan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.inp-wrap input{width:100%;padding:13px 16px;background:rgba(4,8,26,.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--txt);font-family:var(--mono);font-size:14px;outline:none;transition:.3s;}
+.inp-wrap input:focus{border-color:rgba(56,189,248,.5);box-shadow:0 0 24px rgba(56,189,248,.15);}
+#btn-login{width:100%;padding:14px;background:linear-gradient(135deg,rgba(56,189,248,.9),rgba(139,92,246,.9));border:none;border-radius:12px;color:#fff;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.3s;box-shadow:0 4px 24px rgba(56,189,248,.35);}
+#btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(56,189,248,.5);}
+#login-err{color:var(--rose);font-size:12px;font-family:var(--mono);margin-top:14px;text-align:center;display:none;}
+
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,rgba(56,189,248,.06),rgba(4,8,26,.8) 25%,rgba(4,8,26,.8) 75%,rgba(139,92,246,.06));backdrop-filter:blur(32px) saturate(200%);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 4px 32px rgba(0,0,0,.35);padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hdr-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.hdr-left .ico{color:var(--amber);font-size:20px;filter:drop-shadow(0 0 10px rgba(251,146,60,.7));flex-shrink:0;}
+.hdr-left h1{font-size:13px;font-weight:700;background:linear-gradient(90deg,#fff,rgba(56,189,248,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-center{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.clk{font-family:var(--mono);font-size:20px;font-weight:700;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;filter:drop-shadow(0 0 12px rgba(56,189,248,.4));}
+.clk-d{font-family:var(--mono);font-size:10px;color:var(--txt2);letter-spacing:1px;margin-top:1px;}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.btn-s{padding:7px 14px;border-radius:10px;font-family:var(--disp);font-size:12px;font-weight:600;cursor:pointer;transition:.3s;display:flex;align-items:center;gap:6px;border:none;backdrop-filter:blur(12px);}
+.btn-xl{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(20,184,166,.1));border:1px solid rgba(16,185,129,.3);color:var(--emerald);}
+.btn-xl:hover{background:linear-gradient(135deg,rgba(16,185,129,.28),rgba(20,184,166,.2));box-shadow:0 4px 18px rgba(16,185,129,.25);transform:translateY(-1px);}
+.btn-out{background:linear-gradient(135deg,rgba(244,63,94,.1),rgba(236,72,153,.07));border:1px solid rgba(244,63,94,.25);color:var(--rose);}
+.btn-out:hover{background:linear-gradient(135deg,rgba(244,63,94,.22),rgba(236,72,153,.15));}
+
+/* ALERT */
+#alert-bar{background:linear-gradient(90deg,rgba(244,63,94,.08),rgba(244,63,94,.2),rgba(244,63,94,.08));backdrop-filter:blur(12px);border-bottom:1px solid rgba(244,63,94,.35);color:#fca5a5;padding:9px;text-align:center;font-size:13px;font-weight:600;font-family:var(--mono);display:none;animation:ap 1.5s infinite;}
+@keyframes ap{0%,100%{opacity:.8}50%{opacity:1}}
+
+/* PAGES */
+.page-wrap{flex:1;overflow-y:auto;padding-bottom:calc(var(--nav) + 16px);}
+.page{display:none;padding:18px 18px 10px;}
+.page.active{display:block;}
+
+/* ── METRIC CARDS ── */
+.grid6{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:16px;}
+.mc{border-radius:var(--r);padding:20px 16px 16px;text-align:center;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;backdrop-filter:var(--blur);}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0;}
+.mc::after{content:'';position:absolute;top:1px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);}
+.mc:hover{transform:translateY(-5px);}
+/* volt */
+.mc.volt{background:linear-gradient(145deg,rgba(56,189,248,.12),rgba(56,189,248,.04),rgba(4,8,26,.4));border:1px solid rgba(56,189,248,.2);box-shadow:0 8px 32px rgba(56,189,248,.1),var(--shadow);}
+.mc.volt::before{background:linear-gradient(90deg,transparent,rgba(56,189,248,.9),transparent);}
+.mc.volt:hover{border-color:rgba(56,189,248,.5);box-shadow:0 20px 50px rgba(56,189,248,.2),var(--shadow);}
+/* curr */
+.mc.curr{background:linear-gradient(145deg,rgba(139,92,246,.12),rgba(139,92,246,.04),rgba(4,8,26,.4));border:1px solid rgba(139,92,246,.2);box-shadow:0 8px 32px rgba(139,92,246,.1),var(--shadow);}
+.mc.curr::before{background:linear-gradient(90deg,transparent,rgba(139,92,246,.9),transparent);}
+.mc.curr:hover{border-color:rgba(139,92,246,.5);box-shadow:0 20px 50px rgba(139,92,246,.2),var(--shadow);}
+/* pwr */
+.mc.pwr{background:linear-gradient(145deg,rgba(251,146,60,.12),rgba(251,146,60,.04),rgba(4,8,26,.4));border:1px solid rgba(251,146,60,.2);box-shadow:0 8px 32px rgba(251,146,60,.1),var(--shadow);}
+.mc.pwr::before{background:linear-gradient(90deg,transparent,rgba(251,146,60,.9),transparent);}
+.mc.pwr:hover{border-color:rgba(251,146,60,.5);box-shadow:0 20px 50px rgba(251,146,60,.2),var(--shadow);}
+/* temp */
+.mc.temp{background:linear-gradient(145deg,rgba(244,63,94,.12),rgba(244,63,94,.04),rgba(4,8,26,.4));border:1px solid rgba(244,63,94,.2);box-shadow:0 8px 32px rgba(244,63,94,.1),var(--shadow);}
+.mc.temp::before{background:linear-gradient(90deg,transparent,rgba(244,63,94,.9),transparent);}
+.mc.temp:hover{border-color:rgba(244,63,94,.5);box-shadow:0 20px 50px rgba(244,63,94,.2),var(--shadow);}
+/* lux */
+.mc.lux{background:linear-gradient(145deg,rgba(250,204,21,.1),rgba(250,204,21,.04),rgba(4,8,26,.4));border:1px solid rgba(250,204,21,.18);box-shadow:0 8px 32px rgba(250,204,21,.08),var(--shadow);}
+.mc.lux::before{background:linear-gradient(90deg,transparent,rgba(250,204,21,.9),transparent);}
+.mc.lux:hover{border-color:rgba(250,204,21,.45);box-shadow:0 20px 50px rgba(250,204,21,.15),var(--shadow);}
+/* eff */
+.mc.eff{background:linear-gradient(145deg,rgba(16,185,129,.12),rgba(20,184,166,.06),rgba(4,8,26,.4));border:1px solid rgba(16,185,129,.2);box-shadow:0 8px 32px rgba(16,185,129,.1),var(--shadow);}
+.mc.eff::before{background:linear-gradient(90deg,transparent,rgba(16,185,129,.9),transparent);}
+.mc.eff:hover{border-color:rgba(16,185,129,.5);box-shadow:0 20px 50px rgba(16,185,129,.2),var(--shadow);}
+
+.mc-ico{font-size:26px;margin-bottom:10px;}
+.mc.volt .mc-ico{color:var(--cyan);filter:drop-shadow(0 0 10px rgba(56,189,248,.6));}
+.mc.curr .mc-ico{color:var(--violet);filter:drop-shadow(0 0 10px rgba(139,92,246,.6));}
+.mc.pwr  .mc-ico{color:var(--amber);filter:drop-shadow(0 0 10px rgba(251,146,60,.6));}
+.mc.temp .mc-ico{color:var(--rose);filter:drop-shadow(0 0 10px rgba(244,63,94,.6));}
+.mc.lux  .mc-ico{color:var(--yellow);filter:drop-shadow(0 0 10px rgba(250,204,21,.6));}
+.mc.eff  .mc-ico{color:var(--emerald);filter:drop-shadow(0 0 10px rgba(16,185,129,.6));}
+
+.mc-lbl{font-size:10px;font-family:var(--mono);color:var(--txt2);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
+.mc-val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--txt);line-height:1;margin-bottom:6px;}
+.mc-sub{font-size:11px;font-family:var(--mono);color:var(--txt2);}
+
+/* ── CHARTS ── */
+.grid3c{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px;}
+.cc{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.02),rgba(4,8,26,.5));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);border-radius:var(--r);padding:16px;height:230px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.cc::after{content:'';position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
+.cc:nth-child(1){border-color:rgba(56,189,248,.15);box-shadow:0 4px 24px rgba(56,189,248,.06),var(--shadow);}
+.cc:nth-child(2){border-color:rgba(139,92,246,.15);box-shadow:0 4px 24px rgba(139,92,246,.06),var(--shadow);}
+.cc:nth-child(3){border-color:rgba(251,146,60,.15);box-shadow:0 4px 24px rgba(251,146,60,.06),var(--shadow);}
+.cc-ttl{font-size:11px;font-family:var(--mono);color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.cc canvas{flex:1;min-height:0;}
+
+/* ── STATUS BAR ── */
+.sbar{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);border-radius:var(--r);padding:12px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:12px;position:relative;overflow:hidden;margin-bottom:16px;}
+.sbar::after{content:'';position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
+.sitems{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.si{display:flex;align-items:center;gap:6px;}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 12px var(--emerald);animation:ld 2s ease-in-out infinite;}
+@keyframes ld{0%,100%{opacity:1;box-shadow:0 0 12px var(--emerald)}50%{opacity:.35;box-shadow:0 0 4px var(--emerald)}}
+.dot-live.dead{background:var(--rose);box-shadow:0 0 10px var(--rose);animation:none;}
+
+/* ── CONNECTION STATUS ROW ── */
+.conn-row{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(4,8,26,.5));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 20px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+.conn-item{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;}
+.ci-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ci-dot.on{background:var(--emerald);box-shadow:0 0 10px var(--emerald);}
+.ci-dot.off{background:var(--rose);box-shadow:0 0 8px var(--rose);}
+.ci-dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+.ci-lbl{color:var(--txt2);}
+.ci-val{font-weight:700;}
+
+/* ── SENSOR PAGE ── */
+.pg-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.pg-hdr h2{font-size:18px;font-weight:700;}
+.pg-hdr p{font-size:12px;font-family:var(--mono);color:var(--txt2);margin-top:2px;}
+
+.sensor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.sc{backdrop-filter:var(--blur);box-shadow:var(--shadow);border-radius:var(--r);padding:22px 18px;position:relative;overflow:hidden;transition:.3s;}
+.sc::before{content:'';position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);}
+.sc.online{background:linear-gradient(145deg,rgba(16,185,129,.1),rgba(20,184,166,.04),rgba(4,8,26,.45));border:1px solid rgba(16,185,129,.25);}
+.sc.offline{background:linear-gradient(145deg,rgba(244,63,94,.1),rgba(244,63,94,.04),rgba(4,8,26,.45));border:1px solid rgba(244,63,94,.25);}
+.sc.warning{background:linear-gradient(145deg,rgba(251,146,60,.1),rgba(251,146,60,.04),rgba(4,8,26,.45));border:1px solid rgba(251,146,60,.25);}
+.sc-glow{position:absolute;top:0;right:0;width:120px;height:120px;border-radius:50%;transform:translate(50px,-50px);opacity:.12;filter:blur(24px);}
+.sc.online .sc-glow{background:var(--emerald);}
+.sc.offline .sc-glow{background:var(--rose);}
+.sc.warning .sc-glow{background:var(--amber);}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.sc-name{font-size:15px;font-weight:700;font-family:var(--mono);}
+.sc-type{font-size:11px;color:var(--txt2);margin-top:3px;font-family:var(--mono);}
+.badge{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;backdrop-filter:blur(12px);}
+.b-on{background:rgba(16,185,129,.15);color:var(--emerald);border:1px solid rgba(16,185,129,.35);}
+.b-off{background:rgba(244,63,94,.15);color:var(--rose);border:1px solid rgba(244,63,94,.35);}
+.b-warn{background:rgba(251,146,60,.15);color:var(--amber);border:1px solid rgba(251,146,60,.35);}
+.smr{display:flex;flex-direction:column;gap:7px;}
+.sm-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(4,8,26,.35);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.05);border-radius:10px;font-family:var(--mono);font-size:12px;}
+.sm-k{color:var(--txt2);}
+.sm-v{font-weight:600;}
+.sc-addr{margin-top:12px;padding:8px 12px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.14);border-radius:10px;font-family:var(--mono);font-size:11px;color:var(--cyan);display:flex;justify-content:space-between;}
+
+/* ── ERROR LOG ── */
+.err-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
+.err-hdr h2{font-size:18px;font-weight:700;}
+.err-hdr p{font-size:12px;font-family:var(--mono);color:var(--txt2);margin-top:3px;}
+.btn-clr{padding:8px 16px;border-radius:10px;cursor:pointer;transition:.3s;background:linear-gradient(135deg,rgba(244,63,94,.1),rgba(236,72,153,.06));backdrop-filter:blur(12px);border:1px solid rgba(244,63,94,.28);color:var(--rose);font-family:var(--mono);font-size:12px;display:flex;align-items:center;gap:6px;}
+.btn-clr:hover{background:linear-gradient(135deg,rgba(244,63,94,.22),rgba(236,72,153,.14));}
+.err-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px;}
+.esc{backdrop-filter:var(--blur);border-radius:var(--r);padding:16px;text-align:center;position:relative;overflow:hidden;}
+.esc:nth-child(1){background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(4,8,26,.4));border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);}
+.esc:nth-child(2){background:linear-gradient(145deg,rgba(244,63,94,.1),rgba(4,8,26,.4));border:1px solid rgba(244,63,94,.2);box-shadow:0 4px 20px rgba(244,63,94,.08),var(--shadow);}
+.esc:nth-child(3){background:linear-gradient(145deg,rgba(251,146,60,.1),rgba(4,8,26,.4));border:1px solid rgba(251,146,60,.2);box-shadow:0 4px 20px rgba(251,146,60,.08),var(--shadow);}
+.esc:nth-child(4){background:linear-gradient(145deg,rgba(56,189,248,.08),rgba(4,8,26,.4));border:1px solid rgba(56,189,248,.15);box-shadow:0 4px 20px rgba(56,189,248,.06),var(--shadow);}
+.esc::after{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);}
+.esc-n{font-family:var(--mono);font-size:26px;font-weight:700;}
+.esc-l{font-size:11px;color:var(--txt2);font-family:var(--mono);margin-top:4px;}
+.err-box{background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(4,8,26,.5));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.09);box-shadow:var(--shadow);border-radius:var(--r);overflow:hidden;}
+.err-box-hdr{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.05);display:grid;grid-template-columns:155px 110px 1fr 110px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;background:rgba(56,189,248,.03);}
+#err-body{max-height:360px;overflow-y:auto;}
+#err-body::-webkit-scrollbar{width:4px;}
+#err-body::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:4px;}
+.er{padding:11px 18px;display:grid;grid-template-columns:155px 110px 1fr 110px;gap:10px;border-bottom:1px solid rgba(255,255,255,.03);font-family:var(--mono);font-size:12px;transition:.2s;align-items:center;}
+.er:hover{background:rgba(56,189,248,.04);}
+.et{color:var(--txt2);}
+.ed{color:var(--cyan);font-weight:600;}
+.em{color:var(--txt);}
+.el{padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;text-align:center;backdrop-filter:blur(8px);}
+.lc{background:rgba(244,63,94,.12);color:var(--rose);border:1px solid rgba(244,63,94,.3);}
+.lw{background:rgba(251,146,60,.12);color:var(--amber);border:1px solid rgba(251,146,60,.3);}
+.li{background:rgba(56,189,248,.08);color:var(--cyan);border:1px solid rgba(56,189,248,.2);}
+.no-err{padding:50px 20px;text-align:center;font-family:var(--mono);color:var(--txt2);}
+.no-err i{font-size:38px;color:var(--emerald);margin-bottom:12px;display:block;filter:drop-shadow(0 0 14px rgba(16,185,129,.5));}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:linear-gradient(90deg,rgba(56,189,248,.04),rgba(4,8,26,.85) 20%,rgba(4,8,26,.85) 80%,rgba(139,92,246,.04));backdrop-filter:blur(36px) saturate(220%);border-top:1px solid rgba(255,255,255,.08);box-shadow:0 -4px 32px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-around;z-index:50;padding:0 8px;}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;cursor:pointer;border-radius:14px;transition:all .25s;position:relative;user-select:none;border:none;background:transparent;}
+.ntab i{font-size:17px;color:var(--txt3);transition:.25s;}
+.ntab span{font-size:10px;font-family:var(--mono);color:var(--txt3);transition:.25s;letter-spacing:.5px;}
+.ntab.active{background:linear-gradient(135deg,rgba(56,189,248,.1),rgba(139,92,246,.06));backdrop-filter:blur(12px);border:1px solid rgba(56,189,248,.15);}
+.ntab.active i{color:var(--cyan);filter:drop-shadow(0 0 10px rgba(56,189,248,.6));}
+.ntab.active span{color:var(--cyan);}
+.ntab.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 14px var(--cyan);}
+.ntab:hover:not(.active){background:rgba(56,189,248,.04);}
+.ntab:hover:not(.active) i{color:var(--txt2);}
+.nbadge{position:absolute;top:6px;right:calc(50% - 18px);background:linear-gradient(135deg,var(--rose),var(--pink));color:#fff;font-size:10px;font-weight:700;font-family:var(--mono);width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg);box-shadow:0 0 10px rgba(244,63,94,.5);}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(56,189,248,.25);border-radius:4px;}
+
+@media(max-width:600px){
+  .hdr-left h1{display:none;}
+  .clk{font-size:16px;}
+  .err-box-hdr,.er{grid-template-columns:115px 85px 1fr;}
+  .er .el,.err-box-hdr>*:last-child{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="orb1"></div><div class="orb2"></div><div class="orb3"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon-ring"><i class="fa-solid fa-solar-panel"></i></div>
+      <h2>HỆ THỐNG GIÁM SÁT NĂNG LƯỢNG MẶT TRỜI</h2>
+      <p>NHÓM 2_3 — T-Digital Solar</p>
+    </div>
+    <div class="inp-wrap"><label>Tài khoản</label><input type="text" id="u" placeholder="Nhập tài khoản..."></div>
+    <div class="inp-wrap"><label>Mật khẩu</label><input type="password" id="pw" placeholder="Nhập mật khẩu..."></div>
+    <button id="btn-login" onclick="doLogin()">VÀO HỆ THỐNG</button>
+    <p id="login-err"><i class="fa-solid fa-circle-exclamation"></i> Thông tin đăng nhập chưa đúng!</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-left">
+      <i class="fa-solid fa-bolt-lightning ico"></i>
+      <div><h1>T-DIGITAL · GIÁM SÁT NĂNG LƯỢNG MẶT TRỜI TOÀN DIỆN</h1></div>
+    </div>
+    <div class="hdr-center">
+      <div class="clk" id="clk">00:00:00</div>
+      <div class="clk-d" id="clk-d">--/--/----</div>
+    </div>
+    <div class="hdr-right">
+      <button class="btn-s btn-xl" onclick="doExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button class="btn-s btn-out" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>
+    </div>
+  </header>
+
+  <div id="alert-bar"><i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO: MẤT KẾT NỐI VỚI THIẾT BỊ ESP32! (QUÁ THỜI GIAN ĐỒNG BỘ)</div>
+
+  <div class="page-wrap">
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="pg-dash">
+
+      <!-- Connection status row -->
+      <div class="conn-row" id="conn-row">
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-sys"></div>
+          <span class="ci-lbl">Hệ thống:</span>
+          <span class="ci-val" id="v-sys" style="color:var(--txt2)">--</span>
+        </div>
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-wifi"></div>
+          <span class="ci-lbl">WiFi ESP32:</span>
+          <span class="ci-val" id="v-wifi" style="color:var(--txt2)">--</span>
+        </div>
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-ina"></div>
+          <span class="ci-lbl">INA226:</span>
+          <span class="ci-val" id="v-ina" style="color:var(--txt2)">--</span>
+        </div>
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-ds"></div>
+          <span class="ci-lbl">DS18B20:</span>
+          <span class="ci-val" id="v-ds" style="color:var(--txt2)">--</span>
+        </div>
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-mpu"></div>
+          <span class="ci-lbl">MPU6050:</span>
+          <span class="ci-val" id="v-mpu" style="color:var(--txt2)">--</span>
+        </div>
+        <div class="conn-item">
+          <div class="ci-dot off" id="ci-veml"></div>
+          <span class="ci-lbl">VEML7700:</span>
+          <span class="ci-val" id="v-veml" style="color:var(--txt2)">--</span>
+        </div>
+      </div>
+
+      <!-- Metric cards -->
+      <div class="grid6">
+        <div class="mc volt">
+          <div class="mc-ico"><i class="fa-solid fa-car-battery"></i></div>
+          <div class="mc-lbl">Điện Áp (U)</div>
+          <div class="mc-val" id="v-u">0.0 V</div>
+          <div class="mc-sub">Giới hạn: 20.0 V</div>
+        </div>
+        <div class="mc curr">
+          <div class="mc-ico"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          <div class="mc-lbl">Dòng Điện (I)</div>
+          <div class="mc-val" id="v-i">0.00 A</div>
+          <div class="mc-sub">Giới hạn: 10.0 A</div>
+        </div>
+        <div class="mc pwr">
+          <div class="mc-ico"><i class="fa-solid fa-plug"></i></div>
+          <div class="mc-lbl">Công Suất (P)</div>
+          <div class="mc-val" id="v-p">0.0 W</div>
+          <div class="mc-sub">Định mức pin: 200 W</div>
+        </div>
+        <div class="mc temp">
+          <div class="mc-ico"><i class="fa-solid fa-temperature-half"></i></div>
+          <div class="mc-lbl">Nhiệt Độ Pin</div>
+          <div class="mc-val" id="v-t">-- °C</div>
+          <div class="mc-sub">Ngưỡng nóng: 80 °C</div>
+        </div>
+        <div class="mc lux">
+          <div class="mc-ico"><i class="fa-solid fa-sun"></i></div>
+          <div class="mc-lbl">Cường Độ Ánh Sáng</div>
+          <div class="mc-val" id="v-lux">0 Lux</div>
+          <div class="mc-sub" id="v-pl">P lý thuyết: 0.00 W</div>
+        </div>
+        <div class="mc eff">
+          <div class="mc-ico"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="mc-lbl">Hiệu Suất Thực Tế</div>
+          <div class="mc-val" id="v-hs" style="font-family:var(--mono)">0.0%</div>
+          <div class="mc-sub" id="v-hsd">Dự kiến (HSA): 0.0%</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid3c">
+        <div class="cc"><div class="cc-ttl"><i class="fa-solid fa-bolt" style="color:var(--cyan)"></i> Điện Áp U (V)</div><canvas id="ch-u"></canvas></div>
+        <div class="cc"><div class="cc-ttl"><i class="fa-solid fa-wave-square" style="color:var(--violet)"></i> Dòng Điện I (A)</div><canvas id="ch-i"></canvas></div>
+        <div class="cc"><div class="cc-ttl"><i class="fa-solid fa-chart-area" style="color:var(--amber)"></i> Công Suất P (W)</div><canvas id="ch-p"></canvas></div>
+      </div>
+
+      <!-- IMU + status bar -->
+      <div class="sbar">
+        <div class="sitems">
+          <div class="si">
+            <i class="fa-solid fa-arrows-up-to-line" style="color:var(--cyan);font-size:13px"></i>
+            <span style="color:var(--txt2)">Trục X (Nghiêng):</span>
+            <span id="v-gx" style="color:var(--cyan);font-weight:700">0°</span>
+          </div>
+          <div class="si">
+            <i class="fa-solid fa-arrows-left-right" style="color:var(--violet);font-size:13px"></i>
+            <span style="color:var(--txt2)">Trục Y (Xoay):</span>
+            <span id="v-gy" style="color:var(--violet);font-weight:700">0°</span>
+          </div>
+          <div class="si">
+            <i class="fa-solid fa-cube" style="color:var(--indigo);font-size:13px"></i>
+            <span style="color:var(--txt2)">Trục Z:</span>
+            <span id="v-gz" style="color:var(--indigo);font-weight:700">0°</span>
+          </div>
+          <div class="si">
+            <i class="fa-solid fa-cloud-sun" style="color:var(--amber);font-size:13px"></i>
+            <span style="color:var(--txt2)">Môi trường:</span>
+            <span id="v-env" style="color:var(--amber);font-weight:700">--°C</span>
+          </div>
+          <div class="si">
+            <i class="fa-solid fa-database" style="color:var(--teal);font-size:13px"></i>
+            <span style="color:var(--txt2)">Bản ghi:</span>
+            <span id="v-cnt" style="color:var(--teal);font-weight:700">0</span>
+          </div>
+        </div>
+        <div class="si">
+          <div class="dot-live" id="dot-live"></div>
+          <span id="lbl-conn" style="color:var(--emerald);font-size:12px;font-family:var(--mono)">Đang kết nối</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SENSORS -->
+    <div class="page" id="pg-sens">
+      <div class="pg-hdr">
+        <div>
+          <h2><i class="fa-solid fa-microchip" style="color:var(--cyan);margin-right:10px"></i>Trạng Thái Cảm Biến</h2>
+          <p>// Kết nối I²C &amp; 1-Wire · Cập nhật tự động mỗi 3s</p>
+        </div>
+      </div>
+      <div class="sensor-grid" id="sensor-grid"></div>
+    </div>
+
+    <!-- PAGE: ERRORS -->
+    <div class="page" id="pg-err">
+      <div class="err-hdr">
+        <div>
+          <h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--rose);margin-right:10px"></i>Lịch Sử Lỗi</h2>
+          <p>// Nhật ký sự kiện &amp; cảnh báo hệ thống</p>
+        </div>
+        <button class="btn-clr" onclick="clearErr()"><i class="fa-solid fa-trash"></i> Xóa lịch sử</button>
+      </div>
+      <div class="err-stats">
+        <div class="esc"><div class="esc-n" id="es-tot" style="color:var(--txt)">0</div><div class="esc-l">Tổng sự kiện</div></div>
+        <div class="esc"><div class="esc-n" id="es-crit" style="color:var(--rose)">0</div><div class="esc-l">Lỗi nghiêm trọng</div></div>
+        <div class="esc"><div class="esc-n" id="es-warn" style="color:var(--amber)">0</div><div class="esc-l">Cảnh báo</div></div>
+        <div class="esc"><div class="esc-n" id="es-info" style="color:var(--cyan)">0</div><div class="esc-l">Thông tin</div></div>
+      </div>
+      <div class="err-box">
+        <div class="err-box-hdr"><span>Thời gian</span><span>Thiết bị</span><span>Mô tả</span><span>Mức độ</span></div>
+        <div id="err-body"><div class="no-err"><i class="fa-solid fa-circle-check"></i>Không có lỗi nào được ghi nhận</div></div>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <nav class="bnav">
+    <button class="ntab active" id="nt-dash" onclick="goPage('dash')"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></button>
+    <button class="ntab" id="nt-sens" onclick="goPage('sens')"><i class="fa-solid fa-microchip"></i><span>Cảm biến</span></button>
+    <button class="ntab" id="nt-err" onclick="goPage('err')"><i class="fa-solid fa-triangle-exclamation"></i><span>Lịch sử lỗi</span><div class="nbadge" id="nbadge" style="display:none">0</div></button>
+  </nav>
+</div>
+
+<script>
+const API = "https://esp32-backend-vqfp.onrender.com/api/data";
+const MAX_PTS = 120;
+
+let logs = [], lastTs = null, chU, chI, chP;
+let errLogs = [], errBadge = 0, lastId = null;
+let ftInt = null, cnInt = null;
+let lastAlert = false;
+let lastThr = {};
+
+// ── Status field definitions ──────────────────────────────────────────────
+// status_value can be: 1/"1"/"OK"/"ok"/"true"/true  → ONLINE
+//                      0/"0"/"ERROR"/"error"/"false"/false → OFFLINE
+//                      anything else → WARNING
+
+function statusOk(v) {
+  if (v === null || v === undefined) return null;
+  const s = String(v).trim().toLowerCase();
+  if (s === '1' || s === 'ok' || s === 'true' || s === 'online') return true;
+  if (s === '0' || s === 'error' || s === 'false' || s === 'offline') return false;
+  return null; // unknown → warning
 }
 
-// ─── BIẾN TOÀN CỤC ─────────────────────────────────────────
-int  currentPage = 0;
-const int maxPages = 2;
-bool isCalibrated = false;
-bool hasError = false;
-bool errDS = false, errINA = false, errMPU = false, errVEML = false;
-bool muteBuzzer = false;
-String errorLog = "";
+const SENSORS = [
+  { id:'INA226',   name:'INA226',   type:'Cảm biến dòng/áp — I²C',    addr:'0x40',   statusKey:'ina226_status',
+    fields:['Điện áp (U)','Dòng điện (I)','Công suất (P)'], keys:['dien_ap','dong_dien','cong_suat'], sfx:['V','A','W'], color:'var(--cyan)' },
+  { id:'VEML7700', name:'VEML7700', type:'Cảm biến ánh sáng — I²C',   addr:'0x10',   statusKey:'veml7700_status',
+    fields:['Cường độ sáng'], keys:['anh_sang'], sfx:['Lux'], color:'var(--yellow)' },
+  { id:'MPU6050',  name:'MPU6050',  type:'Cảm biến gia tốc/góc — I²C',addr:'0x68',   statusKey:'mpu6050_status',
+    fields:['Góc nghiêng X','Góc xoay Y','Góc Z'], keys:['goc_x','goc_y','goc_z'], sfx:['°','°','°'], color:'var(--violet)' },
+  { id:'DS18B20',  name:'DS18B20',  type:'Cảm biến nhiệt độ — 1-Wire',addr:'GPIO 4', statusKey:'ds18b20_status',
+    fields:['Nhiệt độ pin'], keys:['nhiet_do'], sfx:['°C'], color:'var(--rose)' }
+];
 
-float g_tempDS, g_busVoltage, g_current_mA, g_lux, g_deltaPitch, g_deltaRoll, g_deltaYaw;
-unsigned long lastSensorRead = 0;
+// ── Helpers ───────────────────────────────────────────────────────────────
+function ts2date(raw) {
+  if (!raw) return new Date();
+  if (raw.endsWith('Z') || raw.includes('+')) return new Date(raw);
+  return new Date(raw + 'Z');
+}
+function fmtTime(d) {
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function fmtFull(d) {
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
 
-// ─── HÀM WIFI & SERVER ──────────────────────────────────────
-void connectToWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  int retry = 0;
-  while (WiFi.status() != WL_CONNECTED && retry < 20) { delay(500); retry++; }
+// ── Clock ─────────────────────────────────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('clk').textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  const days=['CN','T2','T3','T4','T5','T6','T7'];
+  document.getElementById('clk-d').textContent = `${days[n.getDay()]} ${pad(n.getDate())}/${pad(n.getMonth()+1)}/${n.getFullYear()}`;
+}
+setInterval(tick,1000); tick();
+
+// ── Navigation ────────────────────────────────────────────────────────────
+function goPage(p) {
+  ['dash','sens','err'].forEach(x => {
+    document.getElementById('pg-'+x).classList.remove('active');
+    document.getElementById('nt-'+x).classList.remove('active');
+  });
+  document.getElementById('pg-'+p).classList.add('active');
+  document.getElementById('nt-'+p).classList.add('active');
+  if (p==='err') { errBadge=0; updBadge(); }
+  if (p==='sens') drawSensors();
 }
 
-void sendDataToServer() {
-  if (WiFi.status() != WL_CONNECTED) return;
-
-  WiFiClientSecure client;
-  client.setInsecure();
-  HTTPClient http;
-  http.begin(client, serverTarget);
-  http.addHeader("Content-Type", "application/json");
-
-  // JSON chứa cả giá trị đo và trạng thái kết nối
-  StaticJsonDocument<512> doc;
-  doc["dien_ap"]     = errINA  ? 0 : g_busVoltage;
-  doc["dong_dien"]   = errINA  ? 0 : g_current_mA / 1000.0;
-  doc["cong_suat"]   = errINA  ? 0 : (g_busVoltage * g_current_mA) / 1000.0;
-  doc["nhiet_do"]    = errDS   ? 0 : g_tempDS;
-  doc["anh_sang"]    = errVEML ? 0 : g_lux;
-  
-  // Trạng thái (true = OK, false = Lỗi)
-  doc["stt_ds18b20"]  = !errDS;
-  doc["stt_ina226"]   = !errINA;
-  doc["stt_mpu6050"]  = !errMPU;
-  doc["stt_veml7700"] = !errVEML;
-
-  String jsonStr;
-  serializeJson(doc, jsonStr);
-  http.POST(jsonStr);
-  http.end();
-}
-
-// ─── SETUP ──────────────────────────────────────────────────
-void setup() {
-  Serial.begin(115200);
-  pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_BTN_PAGE, INPUT_PULLUP);
-  pinMode(PIN_BTN_MUTE, INPUT_PULLUP);
-  
-  attachInterrupt(digitalPinToInterrupt(PIN_BTN_PAGE), isr_btnPage, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_BTN_MUTE), isr_btnMute, FALLING);
-
-  SPI.begin(18, 19, 23, TFT_CS);
-  tft.begin();
-  Wire.begin(I2C_SDA, I2C_SCL);
-
-  ina226.init();
-  ds18b20.begin();
-  mpu.begin(0x68, &Wire);
-  veml.begin(&Wire);
-
-  connectToWiFi();
-}
-
-// ─── LOOP ───────────────────────────────────────────────────
-void loop() {
-  unsigned long currentMillis = millis();
-
-  // Xử lý nút bấm...
-  if (btnPageEvent) { btnPageEvent = false; currentPage = (currentPage + 1) % maxPages; tft.fillScreen(ILI9341_BLACK); }
-  if (btnMuteEvent) { btnMuteEvent = false; muteBuzzer = true; }
-
-  // Đọc cảm biến
-  if (currentMillis - lastSensorRead >= 1000) {
-    lastSensorRead = currentMillis;
-    
-    // Kiểm tra kết nối (Ping)
-    errDS = (ds18b20.getTempCByIndex(0) == -127.0f);
-    Wire.beginTransmission(0x40); errINA = (Wire.endTransmission() != 0);
-    Wire.beginTransmission(0x68); errMPU = (Wire.endTransmission() != 0);
-    Wire.beginTransmission(0x10); errVEML = (Wire.endTransmission() != 0);
-
-    if (!errINA) { g_busVoltage = ina226.getBusVoltage_V(); g_current_mA = ina226.getCurrent_mA(); }
-    if (!errVEML) { g_lux = veml.readLux(); }
-    
-    // ... (logic hiển thị màn hình TFT của bạn ở đây)
+// ── Auth ──────────────────────────────────────────────────────────────────
+function doLogin() {
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('pw').value.trim();
+  if (u==='tanvippro' && p==='123456') {
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    initCharts(); lastId=null;
+    addLog('INFO','Hệ thống','Đăng nhập thành công — user: '+u);
+    clearInterval(ftInt); clearInterval(cnInt);
+    fetchData();
+    ftInt = setInterval(fetchData, 3000);
+    cnInt = setInterval(checkConn, 2000);
+  } else {
+    document.getElementById('login-err').style.display='block';
   }
-
-  // Gửi dữ liệu
-  if (currentMillis - lastWifiSend >= WIFI_SEND_INTERVAL) {
-    lastWifiSend = currentMillis;
-    sendDataToServer();
-  }
 }
- 
+function doLogout() {
+  clearInterval(ftInt); clearInterval(cnInt);
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('u').value='';
+  document.getElementById('pw').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────
+function mkOpts() {
+  return {
+    responsive:true, maintainAspectRatio:false, animation:{duration:300},
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{display:false},
+      y:{ticks:{color:'#4a6080',font:{size:10,family:'JetBrains Mono'}},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(255,255,255,.05)'}}
+    }
+  };
+}
+function initCharts() {
+  chU = new Chart(document.getElementById('ch-u').getContext('2d'),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.08)',tension:.4,fill:true,borderWidth:1.8,pointRadius:0,pointHoverRadius:4}]},options:mkOpts()});
+  chI = new Chart(document.getElementById('ch-i').getContext('2d'),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.08)',tension:.4,fill:true,borderWidth:1.8,pointRadius:0,pointHoverRadius:4}]},options:mkOpts()});
+  chP = new Chart(document.getElementById('ch-p').getContext('2d'),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#fb923c',backgroundColor:'rgba(251,146,60,.08)',tension:.4,fill:true,borderWidth:1.8,pointRadius:0,pointHoverRadius:4}]},options:mkOpts()});
+}
+function pushChart(lbl,u,i,p) {
+  [chU,chI,chP].forEach(c=>{if(c.data.labels.length>=MAX_PTS){c.data.labels.shift();c.data.datasets[0].data.shift();}});
+  chU.data.labels.push(lbl); chU.data.datasets[0].data.push(u); chU.update('none');
+  chI.data.labels.push(lbl); chI.data.datasets[0].data.push(i); chI.update('none');
+  chP.data.labels.push(lbl); chP.data.datasets[0].data.push(p); chP.update('none');
+}
+
+// ── Update connection status row ──────────────────────────────────────────
+function updConnRow(d) {
+  function setCI(id, vid, ok, val) {
+    const dot = document.getElementById('ci-'+id);
+    const span = document.getElementById('v-'+vid);
+    if (ok === true)  { dot.className='ci-dot on';   span.style.color='var(--emerald)'; }
+    else if(ok===false){ dot.className='ci-dot off';  span.style.color='var(--rose)'; }
+    else               { dot.className='ci-dot warn'; span.style.color='var(--amber)'; }
+    span.textContent = val;
+  }
+  const sysSt = statusOk(d.system_status);
+  const wfSt  = statusOk(d.wifi_status);
+  const inaSt = statusOk(d.ina226_status);
+  const dsSt  = statusOk(d.ds18b20_status);
+  const mpuSt = statusOk(d.mpu6050_status);
+  const veSt  = statusOk(d.veml7700_status);
+
+  setCI('sys',  'sys',  sysSt, sysSt===true?'OK': sysSt===false?'LỖI':'--');
+  setCI('wifi', 'wifi', wfSt,  wfSt ===true?'KẾT NỐI': wfSt===false?'MẤT':'--');
+  setCI('ina',  'ina',  inaSt, inaSt===true?'OK': inaSt===false?'LỖI':'--');
+  setCI('ds',   'ds',   dsSt,  dsSt ===true?'OK': dsSt ===false?'LỖI':'--');
+  setCI('mpu',  'mpu',  mpuSt, mpuSt===true?'OK': mpuSt===false?'LỖI':'--');
+  setCI('veml', 'veml', veSt,  veSt ===true?'OK': veSt ===false?'LỖI':'--');
+
+  // Sensor status error logging
+  const sensorMap = [
+    {key:'ina226_status', name:'INA226', st:inaSt},
+    {key:'ds18b20_status', name:'DS18B20', st:dsSt},
+    {key:'mpu6050_status', name:'MPU6050', st:mpuSt},
+    {key:'veml7700_status', name:'VEML7700', st:veSt},
+  ];
+  sensorMap.forEach(s => {
+    if (s.st === false) {
+      const now = Date.now();
+      if (!lastThr['s_'+s.key] || now - lastThr['s_'+s.key] > 30000) {
+        addLog('CRITICAL', s.name, `Cảm biến ${s.name} báo lỗi kết nối (status=0)`);
+        lastThr['s_'+s.key] = now;
+      }
+    }
+  });
+}
+
+// ── Fetch ─────────────────────────────────────────────────────────────────
+function fetchData() {
+  fetch(API)
+    .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(data=>{
+      if(!data||!data.length) return;
+      logs = data;
+      const d = data[0];
+      lastTs = Date.now();
+
+      const U = +(d.dien_ap   ?? 0);
+      const I = +(d.dong_dien ?? 0);
+      const P = +(d.cong_suat ?? 0);
+      const T = +(d.nhiet_do  ?? 0);
+      const L = +(d.anh_sang  ?? 0);
+      const GX= +(d.goc_x ?? 0);
+      const GY= +(d.goc_y ?? 0);
+      const GZ= +(d.goc_z ?? 0);
+
+      // Metric cards
+      document.getElementById('v-u').textContent  = U.toFixed(1)+' V';
+      document.getElementById('v-i').textContent  = I.toFixed(2)+' A';
+      document.getElementById('v-p').textContent  = P.toFixed(1)+' W';
+      document.getElementById('v-t').textContent  = T.toFixed(1)+' °C';
+      document.getElementById('v-lux').textContent= L.toFixed(0)+' Lux';
+
+      const PL = L * 0.0079;
+      document.getElementById('v-pl').textContent = 'P lý thuyết: '+PL.toFixed(2)+' W';
+      const HS = PL > 0 ? (P/PL*100) : 0;
+      document.getElementById('v-hs').textContent = HS.toFixed(1)+'%';
+      const HSD = Math.min(95.5, HS*1.15+2.5);
+      document.getElementById('v-hsd').textContent= 'Dự kiến (HSA): '+HSD.toFixed(1)+'%';
+
+      // IMU + env
+      document.getElementById('v-gx').textContent = GX.toFixed(1)+'°';
+      document.getElementById('v-gy').textContent = GY.toFixed(1)+'°';
+      document.getElementById('v-gz').textContent = GZ.toFixed(1)+'°';
+      document.getElementById('v-env').textContent= T.toFixed(1)+'°C';
+      document.getElementById('v-cnt').textContent= data.length;
+
+      // Connection status row
+      updConnRow(d);
+
+      // Thresholds
+      checkThr(U,I,P,T);
+
+      // Charts
+      const cid = d.id ?? d.created_at;
+      if (cid !== lastId) {
+        lastId = cid;
+        pushChart(fmtTime(ts2date(d.created_at)), U, I, P);
+      }
+    })
+    .catch(e=>{
+      console.error(e);
+      addLog('CRITICAL','API','Lỗi kết nối: '+e.message);
+    });
+}
+
+function checkConn() {
+  if (lastTs===null) return;
+  const diff = (Date.now()-lastTs)/1000;
+  const lost = diff > 7;
+  document.getElementById('alert-bar').style.display = lost?'block':'none';
+  const dot = document.getElementById('dot-live');
+  const lbl = document.getElementById('lbl-conn');
+  dot.className = 'dot-live'+(lost?' dead':'');
+  lbl.textContent = lost ? `MẤT KẾT NỐI (>${Math.floor(diff)}s)` : 'Đang kết nối';
+  lbl.style.color = lost ? 'var(--rose)' : 'var(--emerald)';
+  if (lost && !lastAlert) addLog('CRITICAL','ESP32','Mất kết nối thiết bị — không nhận dữ liệu > 7s');
+  lastAlert = lost;
+}
+
+function checkThr(u,i,p,t) {
+  const now = Date.now();
+  [
+    {k:'t', c:t>45,  dev:'DS18B20', m:`Nhiệt độ pin vượt ngưỡng: ${t.toFixed(1)}°C (>45°C)`, l:'WARNING'},
+    {k:'u', c:u>20,  dev:'INA226',  m:`Điện áp vượt ngưỡng: ${u.toFixed(1)}V (>20V)`,        l:'CRITICAL'},
+    {k:'i', c:i>10,  dev:'INA226',  m:`Dòng điện vượt ngưỡng: ${i.toFixed(2)}A (>10A)`,      l:'WARNING'},
+    {k:'p', c:p>200, dev:'INA226',  m:`Công suất vượt ngưỡng: ${p.toFixed(1)}W (>200W)`,     l:'CRITICAL'},
+  ].forEach(c=>{
+    if(c.c && (!lastThr[c.k] || now-lastThr[c.k]>30000)){
+      addLog(c.l, c.dev, c.m); lastThr[c.k]=now;
+    }
+  });
+}
+
+// ── Error log ─────────────────────────────────────────────────────────────
+function addLog(lv, dev, msg) {
+  errLogs.unshift({time:fmtFull(new Date()),device:dev,msg,level:lv});
+  if(errLogs.length>200) errLogs.pop();
+  const ap = document.querySelector('.page.active');
+  if(!ap || ap.id!=='pg-err') { errBadge++; updBadge(); }
+  renderErr();
+}
+function updBadge() {
+  const b=document.getElementById('nbadge');
+  if(errBadge>0){b.style.display='flex';b.textContent=errBadge>99?'99+':errBadge;}
+  else b.style.display='none';
+}
+function renderErr() {
+  const tot=errLogs.length, crit=errLogs.filter(e=>e.level==='CRITICAL').length;
+  const warn=errLogs.filter(e=>e.level==='WARNING').length, info=errLogs.filter(e=>e.level==='INFO').length;
+  document.getElementById('es-tot').textContent=tot;
+  document.getElementById('es-crit').textContent=crit;
+  document.getElementById('es-warn').textContent=warn;
+  document.getElementById('es-info').textContent=info;
+  const body=document.getElementById('err-body');
+  if(!tot){body.innerHTML='<div class="no-err"><i class="fa-solid fa-circle-check"></i>Không có lỗi nào được ghi nhận</div>';return;}
+  const lm={CRITICAL:'lc',WARNING:'lw',INFO:'li'};
+  body.innerHTML=errLogs.map(e=>`
+    <div class="er">
+      <span class="et">${e.time}</span>
+      <span class="ed">${e.device}</span>
+      <span class="em">${e.msg}</span>
+      <span class="el ${lm[e.level]||'li'}">${e.level}</span>
+    </div>`).join('');
+}
+function clearErr(){if(!confirm('Xóa toàn bộ lịch sử lỗi?'))return;errLogs=[];errBadge=0;updBadge();renderErr();}
+
+// ── Sensor page ───────────────────────────────────────────────────────────
+function drawSensors() {
+  const d = logs.length ? logs[0] : null;
+  const conn = lastTs!==null && (Date.now()-lastTs)<7000;
+  document.getElementById('sensor-grid').innerHTML = SENSORS.map(s=>{
+    const rawSt = d ? statusOk(d[s.statusKey]) : null;
+    const status = !conn ? 'offline' : (rawSt===false ? 'offline' : rawSt===null && !d ? 'warning' : 'online');
+    const bt={online:'ONLINE',offline:'OFFLINE',warning:'CHỜ DỮ LIỆU'}[status];
+    const bc={online:'b-on',offline:'b-off',warning:'b-warn'}[status];
+    const rows = s.fields.map((f,i)=>{
+      const rv = d ? (d[s.keys[i]] ?? null) : null;
+      const vstr = rv!==null && rv!==undefined ? Number(rv).toFixed(2)+' '+s.sfx[i] : '--';
+      return `<div class="sm-row"><span class="sm-k">${f}</span><span class="sm-v" style="color:${s.color}">${vstr}</span></div>`;
+    }).join('');
+    return `<div class="sc ${status}">
+      <div class="sc-glow"></div>
+      <div class="sc-top">
+        <div><div class="sc-name" style="color:${s.color}">${s.name}</div><div class="sc-type">${s.type}</div></div>
+        <span class="badge ${bc}">${bt}</span>
+      </div>
+      <div class="smr">${rows}</div>
+      <div class="sc-addr"><span>Địa chỉ / Chân</span><span>${s.addr}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── Excel export ──────────────────────────────────────────────────────────
+function doExcel() {
+  if(!logs.length){alert('Không có dữ liệu để xuất!');return;}
+  try {
+    const rows = logs.map((d,i)=>{
+      const P=+(d.cong_suat||0), PL=(+(d.anh_sang||0))*0.0079;
+      const hs=PL>0?(P/PL*100).toFixed(2):0;
+      const hsd=Math.min(95.5,parseFloat(hs)*1.15+2.5).toFixed(2);
+      const sysOk = statusOk(d.system_status);
+      const wfOk  = statusOk(d.wifi_status);
+      const inOk  = statusOk(d.ina226_status);
+      const dsOk  = statusOk(d.ds18b20_status);
+      const mpOk  = statusOk(d.mpu6050_status);
+      const veOk  = statusOk(d.veml7700_status);
+      const stStr = v => v===true?'OK': v===false?'LỖI':'--';
+      return {
+        'STT':i+1,
+        'Điện Áp U (V)':+(d.dien_ap||0),
+        'Dòng Điện I (A)':+(d.dong_dien||0),
+        'Công Suất P (W)':P,
+        'Ánh Sáng (Lux)':+(d.anh_sang||0),
+        'P_Light LT (W)':PL.toFixed(2),
+        'Hiệu Suất Thực (%)':hs,
+        'Hiệu Suất DK (%)':hsd,
+        'Nhiệt Độ (°C)':+(d.nhiet_do||0),
+        'Góc X (°)':+(d.goc_x||0),
+        'Góc Y (°)':+(d.goc_y||0),
+        'Góc Z (°)':+(d.goc_z||0),
+        'ST Hệ thống':stStr(sysOk),
+        'ST WiFi':stStr(wfOk),
+        'ST INA226':stStr(inOk),
+        'ST DS18B20':stStr(dsOk),
+        'ST MPU6050':stStr(mpOk),
+        'ST VEML7700':stStr(veOk),
+        'Thời Gian (Local)':fmtFull(ts2date(d.created_at))
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=Object.keys(rows[0]).map(k=>({wch:Math.max(k.length+2,14)}));
+    // Force time column to text
+    const hdrs=Object.keys(rows[0]);
+    const tci=hdrs.indexOf('Thời Gian (Local)');
+    const rng=XLSX.utils.decode_range(ws['!ref']);
+    if(tci>=0){
+      for(let r=0;r<=rng.e.r;r++){
+        const ca=XLSX.utils.encode_cell({r,c:tci});
+        if(ws[ca]){ws[ca].t='s';ws[ca].z='@';if(r>0)ws[ca].v=String(ws[ca].v);}
+      }
+    }
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Solar_Data');
+    const n=new Date();
+    XLSX.writeFile(wb,`Solar_${pad(n.getDate())}${pad(n.getMonth()+1)}${n.getFullYear()}_${pad(n.getHours())}${pad(n.getMinutes())}.xlsx`);
+  } catch(e){alert('Lỗi xuất Excel: '+e.message);}
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+</script>
+</body>
+</html> 
