@@ -35,7 +35,6 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--disp);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;position:relative;}
 
-/* BG layers */
 body::before{content:'';position:fixed;inset:0;background:
   radial-gradient(ellipse 80% 50% at 20% 10%,rgba(56,189,248,.07) 0%,transparent 60%),
   radial-gradient(ellipse 60% 40% at 80% 80%,rgba(139,92,246,.07) 0%,transparent 55%),
@@ -53,7 +52,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
 @keyframes ob2{from{transform:scale(1.05)}to{transform:scale(.9) translate(-2%,-2%)}}
 @keyframes ob3{from{opacity:.6;transform:scale(1)}to{opacity:1;transform:scale(1.2)}}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
 .login-box{background:linear-gradient(145deg,rgba(56,189,248,.1),rgba(139,92,246,.08),rgba(236,72,153,.06));backdrop-filter:blur(40px) saturate(220%);border:1px solid rgba(255,255,255,.15);border-radius:32px;padding:52px 44px;width:100%;max-width:420px;box-shadow:0 0 80px rgba(56,189,248,.12),0 40px 80px rgba(0,0,0,.5),inset 0 1.5px 0 rgba(255,255,255,.2);position:relative;z-index:1;}
 .login-logo{text-align:center;margin-bottom:36px;}
@@ -69,7 +68,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
 #btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(56,189,248,.5);}
 #login-err{color:var(--rose);font-size:12px;font-family:var(--mono);margin-top:14px;text-align:center;display:none;}
 
-/* ── APP SHELL ── */
+/* APP SHELL */
 #app{display:none;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
 
 /* HEADER */
@@ -96,33 +95,27 @@ body::after{content:'';position:fixed;inset:0;background-image:
 .page{display:none;padding:18px 18px 10px;}
 .page.active{display:block;}
 
-/* ── METRIC CARDS ── */
+/* METRIC CARDS */
 .grid6{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:16px;}
 .mc{border-radius:var(--r);padding:20px 16px 16px;text-align:center;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;backdrop-filter:var(--blur);}
 .mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0;}
 .mc::after{content:'';position:absolute;top:1px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);}
 .mc:hover{transform:translateY(-5px);}
-/* volt */
 .mc.volt{background:linear-gradient(145deg,rgba(56,189,248,.12),rgba(56,189,248,.04),rgba(4,8,26,.4));border:1px solid rgba(56,189,248,.2);box-shadow:0 8px 32px rgba(56,189,248,.1),var(--shadow);}
 .mc.volt::before{background:linear-gradient(90deg,transparent,rgba(56,189,248,.9),transparent);}
 .mc.volt:hover{border-color:rgba(56,189,248,.5);box-shadow:0 20px 50px rgba(56,189,248,.2),var(--shadow);}
-/* curr */
 .mc.curr{background:linear-gradient(145deg,rgba(139,92,246,.12),rgba(139,92,246,.04),rgba(4,8,26,.4));border:1px solid rgba(139,92,246,.2);box-shadow:0 8px 32px rgba(139,92,246,.1),var(--shadow);}
 .mc.curr::before{background:linear-gradient(90deg,transparent,rgba(139,92,246,.9),transparent);}
 .mc.curr:hover{border-color:rgba(139,92,246,.5);box-shadow:0 20px 50px rgba(139,92,246,.2),var(--shadow);}
-/* pwr */
 .mc.pwr{background:linear-gradient(145deg,rgba(251,146,60,.12),rgba(251,146,60,.04),rgba(4,8,26,.4));border:1px solid rgba(251,146,60,.2);box-shadow:0 8px 32px rgba(251,146,60,.1),var(--shadow);}
 .mc.pwr::before{background:linear-gradient(90deg,transparent,rgba(251,146,60,.9),transparent);}
 .mc.pwr:hover{border-color:rgba(251,146,60,.5);box-shadow:0 20px 50px rgba(251,146,60,.2),var(--shadow);}
-/* temp */
 .mc.temp{background:linear-gradient(145deg,rgba(244,63,94,.12),rgba(244,63,94,.04),rgba(4,8,26,.4));border:1px solid rgba(244,63,94,.2);box-shadow:0 8px 32px rgba(244,63,94,.1),var(--shadow);}
 .mc.temp::before{background:linear-gradient(90deg,transparent,rgba(244,63,94,.9),transparent);}
 .mc.temp:hover{border-color:rgba(244,63,94,.5);box-shadow:0 20px 50px rgba(244,63,94,.2),var(--shadow);}
-/* lux */
 .mc.lux{background:linear-gradient(145deg,rgba(250,204,21,.1),rgba(250,204,21,.04),rgba(4,8,26,.4));border:1px solid rgba(250,204,21,.18);box-shadow:0 8px 32px rgba(250,204,21,.08),var(--shadow);}
 .mc.lux::before{background:linear-gradient(90deg,transparent,rgba(250,204,21,.9),transparent);}
 .mc.lux:hover{border-color:rgba(250,204,21,.45);box-shadow:0 20px 50px rgba(250,204,21,.15),var(--shadow);}
-/* eff */
 .mc.eff{background:linear-gradient(145deg,rgba(16,185,129,.12),rgba(20,184,166,.06),rgba(4,8,26,.4));border:1px solid rgba(16,185,129,.2);box-shadow:0 8px 32px rgba(16,185,129,.1),var(--shadow);}
 .mc.eff::before{background:linear-gradient(90deg,transparent,rgba(16,185,129,.9),transparent);}
 .mc.eff:hover{border-color:rgba(16,185,129,.5);box-shadow:0 20px 50px rgba(16,185,129,.2),var(--shadow);}
@@ -139,7 +132,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
 .mc-val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--txt);line-height:1;margin-bottom:6px;}
 .mc-sub{font-size:11px;font-family:var(--mono);color:var(--txt2);}
 
-/* ── CHARTS ── */
+/* CHARTS */
 .grid3c{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px;}
 .cc{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.02),rgba(4,8,26,.5));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);border-radius:var(--r);padding:16px;height:230px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .cc::after{content:'';position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
@@ -149,7 +142,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
 .cc-ttl{font-size:11px;font-family:var(--mono);color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .cc canvas{flex:1;min-height:0;}
 
-/* ── STATUS BAR ── */
+/* STATUS BAR */
 .sbar{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);border-radius:var(--r);padding:12px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:12px;position:relative;overflow:hidden;margin-bottom:16px;}
 .sbar::after{content:'';position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
 .sitems{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
@@ -158,17 +151,21 @@ body::after{content:'';position:fixed;inset:0;background-image:
 @keyframes ld{0%,100%{opacity:1;box-shadow:0 0 12px var(--emerald)}50%{opacity:.35;box-shadow:0 0 4px var(--emerald)}}
 .dot-live.dead{background:var(--rose);box-shadow:0 0 10px var(--rose);animation:none;}
 
-/* ── CONNECTION STATUS ROW ── */
+/* CONNECTION STATUS ROW */
 .conn-row{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(4,8,26,.5));backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 20px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
 .conn-item{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;}
 .ci-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.ci-dot.on{background:var(--emerald);box-shadow:0 0 10px var(--emerald);}
+.ci-dot.on{background:var(--emerald);box-shadow:0 0 10px var(--emerald);animation:ld 2s ease-in-out infinite;}
 .ci-dot.off{background:var(--rose);box-shadow:0 0 8px var(--rose);}
 .ci-dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
 .ci-lbl{color:var(--txt2);}
-.ci-val{font-weight:700;}
+.ci-val{font-weight:700;font-size:11px;padding:2px 8px;border-radius:8px;letter-spacing:.5px;}
+/* ── FIX 1: conn pill colours ── */
+.ci-val.v-online{color:var(--emerald);background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);}
+.ci-val.v-offline{color:var(--rose);background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.25);}
+.ci-val.v-unknown{color:var(--txt2);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
 
-/* ── SENSOR PAGE ── */
+/* SENSOR PAGE */
 .pg-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
 .pg-hdr h2{font-size:18px;font-weight:700;}
 .pg-hdr p{font-size:12px;font-family:var(--mono);color:var(--txt2);margin-top:2px;}
@@ -186,17 +183,22 @@ body::after{content:'';position:fixed;inset:0;background-image:
 .sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
 .sc-name{font-size:15px;font-weight:700;font-family:var(--mono);}
 .sc-type{font-size:11px;color:var(--txt2);margin-top:3px;font-family:var(--mono);}
-.badge{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;backdrop-filter:blur(12px);}
+/* ── FIX 2: sensor badge text ── */
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.8px;backdrop-filter:blur(12px);display:flex;align-items:center;gap:5px;}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .b-on{background:rgba(16,185,129,.15);color:var(--emerald);border:1px solid rgba(16,185,129,.35);}
+.b-on::before{background:var(--emerald);box-shadow:0 0 6px var(--emerald);animation:ld 2s ease-in-out infinite;}
 .b-off{background:rgba(244,63,94,.15);color:var(--rose);border:1px solid rgba(244,63,94,.35);}
+.b-off::before{background:var(--rose);}
 .b-warn{background:rgba(251,146,60,.15);color:var(--amber);border:1px solid rgba(251,146,60,.35);}
+.b-warn::before{background:var(--amber);}
 .smr{display:flex;flex-direction:column;gap:7px;}
 .sm-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(4,8,26,.35);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.05);border-radius:10px;font-family:var(--mono);font-size:12px;}
 .sm-k{color:var(--txt2);}
 .sm-v{font-weight:600;}
 .sc-addr{margin-top:12px;padding:8px 12px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.14);border-radius:10px;font-family:var(--mono);font-size:11px;color:var(--cyan);display:flex;justify-content:space-between;}
 
-/* ── ERROR LOG ── */
+/* ERROR LOG */
 .err-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
 .err-hdr h2{font-size:18px;font-weight:700;}
 .err-hdr p{font-size:12px;font-family:var(--mono);color:var(--txt2);margin-top:3px;}
@@ -228,7 +230,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
 .no-err{padding:50px 20px;text-align:center;font-family:var(--mono);color:var(--txt2);}
 .no-err i{font-size:38px;color:var(--emerald);margin-bottom:12px;display:block;filter:drop-shadow(0 0 14px rgba(16,185,129,.5));}
 
-/* ── BOTTOM NAV ── */
+/* BOTTOM NAV */
 .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:linear-gradient(90deg,rgba(56,189,248,.04),rgba(4,8,26,.85) 20%,rgba(4,8,26,.85) 80%,rgba(139,92,246,.04));backdrop-filter:blur(36px) saturate(220%);border-top:1px solid rgba(255,255,255,.08);box-shadow:0 -4px 32px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-around;z-index:50;padding:0 8px;}
 .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;cursor:pointer;border-radius:14px;transition:all .25s;position:relative;user-select:none;border:none;background:transparent;}
 .ntab i{font-size:17px;color:var(--txt3);transition:.25s;}
@@ -299,32 +301,32 @@ body::after{content:'';position:fixed;inset:0;background-image:
         <div class="conn-item">
           <div class="ci-dot off" id="ci-sys"></div>
           <span class="ci-lbl">Hệ thống:</span>
-          <span class="ci-val" id="v-sys" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-sys">--</span>
         </div>
         <div class="conn-item">
           <div class="ci-dot off" id="ci-wifi"></div>
           <span class="ci-lbl">WiFi ESP32:</span>
-          <span class="ci-val" id="v-wifi" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-wifi">--</span>
         </div>
         <div class="conn-item">
           <div class="ci-dot off" id="ci-ina"></div>
           <span class="ci-lbl">INA226:</span>
-          <span class="ci-val" id="v-ina" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-ina">--</span>
         </div>
         <div class="conn-item">
           <div class="ci-dot off" id="ci-ds"></div>
           <span class="ci-lbl">DS18B20:</span>
-          <span class="ci-val" id="v-ds" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-ds">--</span>
         </div>
         <div class="conn-item">
           <div class="ci-dot off" id="ci-mpu"></div>
           <span class="ci-lbl">MPU6050:</span>
-          <span class="ci-val" id="v-mpu" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-mpu">--</span>
         </div>
         <div class="conn-item">
           <div class="ci-dot off" id="ci-veml"></div>
           <span class="ci-lbl">VEML7700:</span>
-          <span class="ci-val" id="v-veml" style="color:var(--txt2)">--</span>
+          <span class="ci-val v-unknown" id="v-veml">--</span>
         </div>
       </div>
 
@@ -443,7 +445,7 @@ body::after{content:'';position:fixed;inset:0;background-image:
       </div>
     </div>
 
-  </div><!-- /page-wrap -->
+  </div>
 
   <nav class="bnav">
     <button class="ntab active" id="nt-dash" onclick="goPage('dash')"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></button>
@@ -462,17 +464,13 @@ let ftInt = null, cnInt = null;
 let lastAlert = false;
 let lastThr = {};
 
-// ── Status field definitions ──────────────────────────────────────────────
-// status_value can be: 1/"1"/"OK"/"ok"/"true"/true  → ONLINE
-//                      0/"0"/"ERROR"/"error"/"false"/false → OFFLINE
-//                      anything else → WARNING
-
+// ── Status helpers ────────────────────────────────────────────────────────
 function statusOk(v) {
   if (v === null || v === undefined) return null;
   const s = String(v).trim().toLowerCase();
   if (s === '1' || s === 'ok' || s === 'true' || s === 'online') return true;
   if (s === '0' || s === 'error' || s === 'false' || s === 'offline') return false;
-  return null; // unknown → warning
+  return null;
 }
 
 const SENSORS = [
@@ -492,9 +490,7 @@ function ts2date(raw) {
   if (raw.endsWith('Z') || raw.includes('+')) return new Date(raw);
   return new Date(raw + 'Z');
 }
-function fmtTime(d) {
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
+function fmtTime(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
 function fmtFull(d) {
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
@@ -570,41 +566,42 @@ function pushChart(lbl,u,i,p) {
   chP.data.labels.push(lbl); chP.data.datasets[0].data.push(p); chP.update('none');
 }
 
-// ── Update connection status row ──────────────────────────────────────────
+// ── FIX 1: Connection status row — "ĐÃ KẾT NỐI" / "MẤT KẾT NỐI" ────────
 function updConnRow(d) {
-  function setCI(id, vid, ok, val) {
-    const dot = document.getElementById('ci-'+id);
+  function setCI(id, vid, ok) {
+    const dot  = document.getElementById('ci-'+id);
     const span = document.getElementById('v-'+vid);
-    if (ok === true)  { dot.className='ci-dot on';   span.style.color='var(--emerald)'; }
-    else if(ok===false){ dot.className='ci-dot off';  span.style.color='var(--rose)'; }
-    else               { dot.className='ci-dot warn'; span.style.color='var(--amber)'; }
-    span.textContent = val;
+    // Clear previous classes
+    span.className = 'ci-val';
+    if (ok === true) {
+      dot.className  = 'ci-dot on';
+      span.classList.add('v-online');
+      span.textContent = 'ĐÃ KẾT NỐI';
+    } else if (ok === false) {
+      dot.className  = 'ci-dot off';
+      span.classList.add('v-offline');
+      span.textContent = 'MẤT KẾT NỐI';
+    } else {
+      dot.className  = 'ci-dot warn';
+      span.classList.add('v-unknown');
+      span.textContent = '--';
+    }
   }
-  const sysSt = statusOk(d.system_status);
-  const wfSt  = statusOk(d.wifi_status);
-  const inaSt = statusOk(d.ina226_status);
-  const dsSt  = statusOk(d.ds18b20_status);
-  const mpuSt = statusOk(d.mpu6050_status);
-  const veSt  = statusOk(d.veml7700_status);
 
-  setCI('sys',  'sys',  sysSt, sysSt===true?'OK': sysSt===false?'LỖI':'--');
-  setCI('wifi', 'wifi', wfSt,  wfSt ===true?'KẾT NỐI': wfSt===false?'MẤT':'--');
-  setCI('ina',  'ina',  inaSt, inaSt===true?'OK': inaSt===false?'LỖI':'--');
-  setCI('ds',   'ds',   dsSt,  dsSt ===true?'OK': dsSt ===false?'LỖI':'--');
-  setCI('mpu',  'mpu',  mpuSt, mpuSt===true?'OK': mpuSt===false?'LỖI':'--');
-  setCI('veml', 'veml', veSt,  veSt ===true?'OK': veSt ===false?'LỖI':'--');
+  setCI('sys',  'sys',  statusOk(d.system_status));
+  setCI('wifi', 'wifi', statusOk(d.wifi_status));
+  setCI('ina',  'ina',  statusOk(d.ina226_status));
+  setCI('ds',   'ds',   statusOk(d.ds18b20_status));
+  setCI('mpu',  'mpu',  statusOk(d.mpu6050_status));
+  setCI('veml', 'veml', statusOk(d.veml7700_status));
 
-  // Sensor status error logging
-  const sensorMap = [
-    {key:'ina226_status', name:'INA226', st:inaSt},
-    {key:'ds18b20_status', name:'DS18B20', st:dsSt},
-    {key:'mpu6050_status', name:'MPU6050', st:mpuSt},
-    {key:'veml7700_status', name:'VEML7700', st:veSt},
-  ];
-  sensorMap.forEach(s => {
-    if (s.st === false) {
+  // Sensor error logging (throttled 30s)
+  [{key:'ina226_status',name:'INA226'},{key:'ds18b20_status',name:'DS18B20'},
+   {key:'mpu6050_status',name:'MPU6050'},{key:'veml7700_status',name:'VEML7700'}
+  ].forEach(s => {
+    if (statusOk(d[s.key]) === false) {
       const now = Date.now();
-      if (!lastThr['s_'+s.key] || now - lastThr['s_'+s.key] > 30000) {
+      if (!lastThr['s_'+s.key] || now-lastThr['s_'+s.key]>30000) {
         addLog('CRITICAL', s.name, `Cảm biến ${s.name} báo lỗi kết nối (status=0)`);
         lastThr['s_'+s.key] = now;
       }
@@ -631,34 +628,28 @@ function fetchData() {
       const GY= +(d.goc_y ?? 0);
       const GZ= +(d.goc_z ?? 0);
 
-      // Metric cards
-      document.getElementById('v-u').textContent  = U.toFixed(1)+' V';
-      document.getElementById('v-i').textContent  = I.toFixed(2)+' A';
-      document.getElementById('v-p').textContent  = P.toFixed(1)+' W';
-      document.getElementById('v-t').textContent  = T.toFixed(1)+' °C';
-      document.getElementById('v-lux').textContent= L.toFixed(0)+' Lux';
+      document.getElementById('v-u').textContent   = U.toFixed(1)+' V';
+      document.getElementById('v-i').textContent   = I.toFixed(2)+' A';
+      document.getElementById('v-p').textContent   = P.toFixed(1)+' W';
+      document.getElementById('v-t').textContent   = T.toFixed(1)+' °C';
+      document.getElementById('v-lux').textContent = L.toFixed(0)+' Lux';
 
       const PL = L * 0.0079;
-      document.getElementById('v-pl').textContent = 'P lý thuyết: '+PL.toFixed(2)+' W';
+      document.getElementById('v-pl').textContent  = 'P lý thuyết: '+PL.toFixed(2)+' W';
       const HS = PL > 0 ? (P/PL*100) : 0;
-      document.getElementById('v-hs').textContent = HS.toFixed(1)+'%';
+      document.getElementById('v-hs').textContent  = HS.toFixed(1)+'%';
       const HSD = Math.min(95.5, HS*1.15+2.5);
-      document.getElementById('v-hsd').textContent= 'Dự kiến (HSA): '+HSD.toFixed(1)+'%';
+      document.getElementById('v-hsd').textContent = 'Dự kiến (HSA): '+HSD.toFixed(1)+'%';
 
-      // IMU + env
-      document.getElementById('v-gx').textContent = GX.toFixed(1)+'°';
-      document.getElementById('v-gy').textContent = GY.toFixed(1)+'°';
-      document.getElementById('v-gz').textContent = GZ.toFixed(1)+'°';
-      document.getElementById('v-env').textContent= T.toFixed(1)+'°C';
-      document.getElementById('v-cnt').textContent= data.length;
+      document.getElementById('v-gx').textContent  = GX.toFixed(1)+'°';
+      document.getElementById('v-gy').textContent  = GY.toFixed(1)+'°';
+      document.getElementById('v-gz').textContent  = GZ.toFixed(1)+'°';
+      document.getElementById('v-env').textContent = T.toFixed(1)+'°C';
+      document.getElementById('v-cnt').textContent = data.length;
 
-      // Connection status row
       updConnRow(d);
-
-      // Thresholds
       checkThr(U,I,P,T);
 
-      // Charts
       const cid = d.id ?? d.created_at;
       if (cid !== lastId) {
         lastId = cid;
@@ -732,20 +723,30 @@ function renderErr() {
 }
 function clearErr(){if(!confirm('Xóa toàn bộ lịch sử lỗi?'))return;errLogs=[];errBadge=0;updBadge();renderErr();}
 
-// ── Sensor page ───────────────────────────────────────────────────────────
+// ── FIX 2: Sensor page — ONLINE / OFFLINE badges ─────────────────────────
 function drawSensors() {
-  const d = logs.length ? logs[0] : null;
+  const d    = logs.length ? logs[0] : null;
   const conn = lastTs!==null && (Date.now()-lastTs)<7000;
   document.getElementById('sensor-grid').innerHTML = SENSORS.map(s=>{
-    const rawSt = d ? statusOk(d[s.statusKey]) : null;
-    const status = !conn ? 'offline' : (rawSt===false ? 'offline' : rawSt===null && !d ? 'warning' : 'online');
-    const bt={online:'ONLINE',offline:'OFFLINE',warning:'CHỜ DỮ LIỆU'}[status];
-    const bc={online:'b-on',offline:'b-off',warning:'b-warn'}[status];
+    const rawSt  = d ? statusOk(d[s.statusKey]) : null;
+    // online = data received AND sensor status OK
+    // offline = no data OR sensor status explicitly false
+    // warning = data received but status unknown
+    let status;
+    if (!conn || !d)                  status = 'offline';
+    else if (rawSt === false)         status = 'offline';
+    else if (rawSt === true)          status = 'online';
+    else                              status = 'warning';
+
+    const bt = {online:'ONLINE', offline:'OFFLINE', warning:'CHỜ DỮ LIỆU'}[status];
+    const bc = {online:'b-on',   offline:'b-off',   warning:'b-warn'}[status];
+
     const rows = s.fields.map((f,i)=>{
-      const rv = d ? (d[s.keys[i]] ?? null) : null;
+      const rv   = d ? (d[s.keys[i]] ?? null) : null;
       const vstr = rv!==null && rv!==undefined ? Number(rv).toFixed(2)+' '+s.sfx[i] : '--';
       return `<div class="sm-row"><span class="sm-k">${f}</span><span class="sm-v" style="color:${s.color}">${vstr}</span></div>`;
     }).join('');
+
     return `<div class="sc ${status}">
       <div class="sc-glow"></div>
       <div class="sc-top">
@@ -758,65 +759,74 @@ function drawSensors() {
   }).join('');
 }
 
-// ── Excel export ──────────────────────────────────────────────────────────
+// ── FIX 3: Excel — time column frozen as text string ─────────────────────
 function doExcel() {
   if(!logs.length){alert('Không có dữ liệu để xuất!');return;}
   try {
-    const rows = logs.map((d,i)=>{
-      const P=+(d.cong_suat||0), PL=(+(d.anh_sang||0))*0.0079;
-      const hs=PL>0?(P/PL*100).toFixed(2):0;
-      const hsd=Math.min(95.5,parseFloat(hs)*1.15+2.5).toFixed(2);
-      const sysOk = statusOk(d.system_status);
-      const wfOk  = statusOk(d.wifi_status);
-      const inOk  = statusOk(d.ina226_status);
-      const dsOk  = statusOk(d.ds18b20_status);
-      const mpOk  = statusOk(d.mpu6050_status);
-      const veOk  = statusOk(d.veml7700_status);
-      const stStr = v => v===true?'OK': v===false?'LỖI':'--';
+    // Take latest 100 records (API returns newest-first, so slice 0..100)
+    const slice = logs.slice(0, 100);
+
+    // Build rows — STT starts at 1
+    const rows = slice.map((d, i) => {
+      const P  = +(d.cong_suat||0);
+      const PL = (+(d.anh_sang||0)) * 0.0079;
+      const hs  = PL>0 ? (P/PL*100).toFixed(2) : '0.00';
+      const hsd = Math.min(95.5, parseFloat(hs)*1.15+2.5).toFixed(2);
+      const stStr = v => v===true?'ĐÃ KẾT NỐI': v===false?'MẤT KẾT NỐI':'--';
       return {
-        'STT':i+1,
-        'Điện Áp U (V)':+(d.dien_ap||0),
-        'Dòng Điện I (A)':+(d.dong_dien||0),
-        'Công Suất P (W)':P,
-        'Ánh Sáng (Lux)':+(d.anh_sang||0),
-        'P_Light LT (W)':PL.toFixed(2),
-        'Hiệu Suất Thực (%)':hs,
-        'Hiệu Suất DK (%)':hsd,
-        'Nhiệt Độ (°C)':+(d.nhiet_do||0),
-        'Góc X (°)':+(d.goc_x||0),
-        'Góc Y (°)':+(d.goc_y||0),
-        'Góc Z (°)':+(d.goc_z||0),
-        'ST Hệ thống':stStr(sysOk),
-        'ST WiFi':stStr(wfOk),
-        'ST INA226':stStr(inOk),
-        'ST DS18B20':stStr(dsOk),
-        'ST MPU6050':stStr(mpOk),
-        'ST VEML7700':stStr(veOk),
-        'Thời Gian (Local)':fmtFull(ts2date(d.created_at))
+        'STT': i+1,
+        'Điện Áp U (V)':    +(d.dien_ap   || 0),
+        'Dòng Điện I (A)':  +(d.dong_dien || 0),
+        'Công Suất P (W)':  P,
+        'Ánh Sáng (Lux)':   +(d.anh_sang  || 0),
+        'P_LT (W)':         parseFloat(PL.toFixed(2)),
+        'Hiệu Suất Thực (%)': parseFloat(hs),
+        'Hiệu Suất DK (%)': parseFloat(hsd),
+        'Nhiệt Độ (°C)':    +(d.nhiet_do  || 0),
+        'Góc X (°)':        +(d.goc_x     || 0),
+        'Góc Y (°)':        +(d.goc_y     || 0),
+        'Góc Z (°)':        +(d.goc_z     || 0),
+        'ST Hệ thống':      stStr(statusOk(d.system_status)),
+        'ST WiFi':          stStr(statusOk(d.wifi_status)),
+        'ST INA226':        stStr(statusOk(d.ina226_status)),
+        'ST DS18B20':       stStr(statusOk(d.ds18b20_status)),
+        'ST MPU6050':       stStr(statusOk(d.mpu6050_status)),
+        'ST VEML7700':      stStr(statusOk(d.veml7700_status)),
+        // Prepend apostrophe trick is unreliable — we set cell type to 's' below
+        'Thời Gian': fmtFull(ts2date(d.created_at))
       };
     });
-    const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=Object.keys(rows[0]).map(k=>({wch:Math.max(k.length+2,14)}));
-    // Force time column to text
-    const hdrs=Object.keys(rows[0]);
-    const tci=hdrs.indexOf('Thời Gian (Local)');
-    const rng=XLSX.utils.decode_range(ws['!ref']);
-    if(tci>=0){
-      for(let r=0;r<=rng.e.r;r++){
-        const ca=XLSX.utils.encode_cell({r,c:tci});
-        if(ws[ca]){ws[ca].t='s';ws[ca].z='@';if(r>0)ws[ca].v=String(ws[ca].v);}
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    // Auto column widths
+    const hdrs = Object.keys(rows[0]);
+    ws['!cols'] = hdrs.map(k => ({wch: Math.max(k.length+2, 16)}));
+
+    // Force 'Thời Gian' column to text type so Excel won't reformat it
+    const tci = hdrs.indexOf('Thời Gian');
+    if (tci >= 0) {
+      const rng = XLSX.utils.decode_range(ws['!ref']);
+      for (let r = 0; r <= rng.e.r; r++) {
+        const ca = XLSX.utils.encode_cell({r, c: tci});
+        if (ws[ca]) {
+          ws[ca].t = 's';          // force string type
+          ws[ca].v = String(ws[ca].v ?? '');
+          delete ws[ca].z;         // remove any number format
+          delete ws[ca].w;         // remove cached formatted text
+        }
       }
     }
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,'Solar_Data');
-    const n=new Date();
-    XLSX.writeFile(wb,`Solar_${pad(n.getDate())}${pad(n.getMonth()+1)}${n.getFullYear()}_${pad(n.getHours())}${pad(n.getMinutes())}.xlsx`);
-  } catch(e){alert('Lỗi xuất Excel: '+e.message);}
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Solar_Data');
+    const n = new Date();
+    XLSX.writeFile(wb, `Solar_${pad(n.getDate())}${pad(n.getMonth()+1)}${n.getFullYear()}_${pad(n.getHours())}${pad(n.getMinutes())}.xlsx`);
+  } catch(e) { alert('Lỗi xuất Excel: '+e.message); }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 });
 </script>
 </body>
