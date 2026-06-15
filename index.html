@@ -467,9 +467,45 @@ let lastThr = {};
 // ── Status helpers ────────────────────────────────────────────────────────
 function statusOk(v) {
   if (v === null || v === undefined) return null;
-  const s = String(v).trim().toLowerCase();
-  if (s === '1' || s === 'ok' || s === 'true' || s === 'online') return true;
-  if (s === '0' || s === 'error' || s === 'false' || s === 'offline') return false;
+
+  const s = String(v)
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  // ONLINE
+  if (
+      s === '1' ||
+      s === 'ok' ||
+      s === 'true' ||
+      s === 'online' ||
+      s === 'da ket noi' ||
+      s === 'ket noi'
+  ) {
+      return true;
+  }
+
+  // OFFLINE
+  if (
+      s === '0' ||
+      s === 'error' ||
+      s === 'false' ||
+      s === 'offline' ||
+      s === 'mat ket noi' ||
+      s === 'loi'
+  ) {
+      return false;
+  }
+
+  // WARNING
+  if (
+      s === 'canh bao' ||
+      s === 'warning'
+  ) {
+      return null;
+  }
+
   return null;
 }
 
