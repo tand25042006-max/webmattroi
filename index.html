@@ -478,6 +478,7 @@ function statusOk(v) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
   if ( s == 'binh thuong') return 'normal';
+}
   // ONLINE
   if (
       s === '1' ||
