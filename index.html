@@ -477,7 +477,7 @@ function statusOk(v) {
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
-
+  if ( s == 'binh thuong') return 'normal';
   // ONLINE
   if (
       s === '1' ||
@@ -615,6 +615,10 @@ function updConnRow(d) {
 
   span.className = 'ci-val';
 
+  if ( ok === 'normal') {
+    dot.className = 'ci-dot on';
+    span.classList.add('v-online');
+    span.textContent = 'BÌNH THƯỜNG';
   if (ok === true) {
 
     dot.className = 'ci-dot on';
@@ -790,12 +794,19 @@ function drawSensors() {
     // offline = no data OR sensor status explicitly false
     // warning = data received but status unknown
     let status;
-    if (!conn || !d)                  status = 'offline';
-    else if (rawSt === false)         status = 'offline';
-    else if (rawSt === true)          status = 'online';
-    else                              status = 'warning';
 
-    const bt = {online:'ONLINE', offline:'OFFLINE', warning:'CHỜ DỮ LIỆU'}[status];
+if (!conn || !d)
+    status = 'offline';
+else if (rawSt === false)
+    status = 'offline';
+else if (rawSt === true)
+    status = 'online';
+else if (rawSt === 'warning')
+    status = 'warning';
+else
+    status = 'warning';
+
+    const bt = {online:'ONLINE', offline:'OFFLINE', warning:'CẢNH BÁO'}[status];
     const bc = {online:'b-on',   offline:'b-off',   warning:'b-warn'}[status];
 
     const rows = s.fields.map((f,i)=>{
