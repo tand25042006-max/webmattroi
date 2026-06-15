@@ -620,6 +620,7 @@ function updConnRow(d) {
     dot.className = 'ci-dot on';
     span.classList.add('v-online');
     span.textContent = 'BÌNH THƯỜNG';
+  }
   if (ok === true) {
 
     dot.className = 'ci-dot on';
@@ -649,7 +650,6 @@ function updConnRow(d) {
 
   }
 }
-
   setCI('sys',  'sys',  statusOk(d.system_status));
   setCI('wifi', 'wifi', statusOk(d.wifi_status));
   setCI('ina',  'ina',  statusOk(d.ina226_status));
