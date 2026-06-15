@@ -503,7 +503,7 @@ function statusOk(v) {
       s === 'canh bao' ||
       s === 'warning'
   ) {
-      return null;
+      return "warning";
   }
 
   return null;
@@ -557,7 +557,7 @@ function goPage(p) {
 function doLogin() {
   const u=document.getElementById('u').value.trim();
   const p=document.getElementById('pw').value.trim();
-  if (u==='tanvippro' && p==='123456') {
+  if (u==='nhom23' && p==='232323') {
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
     initCharts(); lastId=null;
@@ -605,24 +605,41 @@ function pushChart(lbl,u,i,p) {
 // ── FIX 1: Connection status row — "ĐÃ KẾT NỐI" / "MẤT KẾT NỐI" ────────
 function updConnRow(d) {
   function setCI(id, vid, ok) {
-    const dot  = document.getElementById('ci-'+id);
-    const span = document.getElementById('v-'+vid);
-    // Clear previous classes
-    span.className = 'ci-val';
-    if (ok === true) {
-      dot.className  = 'ci-dot on';
-      span.classList.add('v-online');
-      span.textContent = 'ĐÃ KẾT NỐI';
-    } else if (ok === false) {
-      dot.className  = 'ci-dot off';
-      span.classList.add('v-offline');
-      span.textContent = 'MẤT KẾT NỐI';
-    } else {
-      dot.className  = 'ci-dot warn';
-      span.classList.add('v-unknown');
-      span.textContent = '--';
-    }
+
+  const dot  = document.getElementById('ci-'+id);
+  const span = document.getElementById('v-'+vid);
+
+  span.className = 'ci-val';
+
+  if (ok === true) {
+
+    dot.className = 'ci-dot on';
+    span.classList.add('v-online');
+    span.textContent = 'ĐÃ KẾT NỐI';
+
   }
+  else if (ok === false) {
+
+    dot.className = 'ci-dot off';
+    span.classList.add('v-offline');
+    span.textContent = 'MẤT KẾT NỐI';
+
+  }
+  else if (ok === 'warning') {
+
+    dot.className = 'ci-dot warn';
+    span.classList.add('v-warning');
+    span.textContent = 'CẢNH BÁO';
+
+  }
+  else {
+
+    dot.className = 'ci-dot warn';
+    span.classList.add('v-unknown');
+    span.textContent = '--';
+
+  }
+}
 
   setCI('sys',  'sys',  statusOk(d.system_status));
   setCI('wifi', 'wifi', statusOk(d.wifi_status));
